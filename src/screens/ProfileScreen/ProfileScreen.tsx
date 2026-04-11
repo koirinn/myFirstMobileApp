@@ -137,7 +137,7 @@ const ProfileScreen: React.FC = () => {
                         <Text style={styles.buttonText}>{button.title}</Text>
                     </Pressable>
                 ))}
-                <View style={styles.demoContent}>
+                {/* <View style={styles.demoContent}>
                     <Text style={styles.demoText}>
                         Экран профиля
                     </Text>
@@ -147,7 +147,7 @@ const ProfileScreen: React.FC = () => {
                     <View style={styles.placeholder} />
                     <View style={styles.placeholder} />
                     <View style={styles.placeholder} />
-                </View>
+                </View> */}
             </ScrollView>
 
             {/* Просто рендерим BottomBar без пропсов */}

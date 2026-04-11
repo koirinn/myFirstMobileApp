@@ -1,8 +1,59 @@
+// import { registerRootComponent } from 'expo';
+
+// import App from './App';
+
+// registerRootComponent(App);
+
+
+
+
+
 import { registerRootComponent } from 'expo';
+import { AppRegistry, Platform } from 'react-native';
+import {
+  checkIfHasSMSPermission,
+  requestReadSMSPermission,
+  startReadSMS,
+} from '@maniac-tech/react-native-expo-read-sms';
 
 import App from './App';
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
+// Функция для инициализации прослушивания SMS
+const initSmsListener = async () => {
+  // Проверяем, есть ли уже разрешения
+  const { hasReceiveSmsPermission, hasReadSmsPermission } =
+    await checkIfHasSMSPermission();
+
+  // Если разрешений нет, запрашиваем их
+  if (!hasReceiveSmsPermission || !hasReadSmsPermission) {
+    const granted = await requestReadSMSPermission();
+    if (!granted) {
+      console.warn('Не удалось получить разрешения для SMS');
+      return;
+    }
+  }
+
+  // Запускаем прослушивание и передаём функцию-обработчик
+  // Каждое новое SMS будет приходить сюда как строка в формате: [номер, текст сообщения]
+  startReadSMS((smsData: string) => {
+    // smsData имеет формат: '[+79001234567, текст сообщения]'
+    const parsedData = smsData.slice(1, -1).split(', ');
+    const senderNumber = parsedData[0];
+    const messageBody = parsedData[1];
+
+    console.log(`Получено SMS от: ${senderNumber}`);
+    console.log(`Текст сообщения: ${messageBody}`);
+
+    // ЗДЕСЬ БУДЕТ ВАША ЛОГИКА ОБРАБОТКИ SMS
+    // Нужно будет загрузить номера и правила, проверить отправителя и текст,
+    // и выполнить нужное действие.
+  });
+};
+
+// Вызываем функцию инициализации при старте приложения
+if (Platform.OS === 'android') {
+  initSmsListener();
+}
+
+// Регистрируем корневой компонент приложения
 registerRootComponent(App);
