@@ -15,6 +15,8 @@ import {
   requestReadSMSPermission,
   startReadSMS,
 } from '@maniac-tech/react-native-expo-read-sms';
+import ApiServise from './src/services/ApiServise';
+import SirenService from './src/services/SirenService';
 
 import App from './App';
 
@@ -43,6 +45,8 @@ const initSmsListener = async () => {
 
     console.log(`Получено SMS от: ${senderNumber}`);
     console.log(`Текст сообщения: ${messageBody}`);
+
+    // const rules = await ApiServise.fetchRulesForPhoneNumber()
 
     // ЗДЕСЬ БУДЕТ ВАША ЛОГИКА ОБРАБОТКИ SMS
     // Нужно будет загрузить номера и правила, проверить отправителя и текст,
