@@ -46,7 +46,13 @@ const initSmsListener = async () => {
     console.log(`Получено SMS от: ${senderNumber}`);
     console.log(`Текст сообщения: ${messageBody}`);
 
-    // const rules = await ApiServise.fetchRulesForPhoneNumber()
+    ApiServise.fetchRulesForPhoneNumberByNumber(senderNumber).then(rules => {
+      rules.forEach((rule: object) => {
+        switch(rule){
+
+        }
+      });
+    })
 
     // ЗДЕСЬ БУДЕТ ВАША ЛОГИКА ОБРАБОТКИ SMS
     // Нужно будет загрузить номера и правила, проверить отправителя и текст,
