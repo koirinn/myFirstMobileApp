@@ -47,9 +47,11 @@ const initSmsListener = async () => {
     console.log(`Текст сообщения: ${messageBody}`);
 
     ApiServise.fetchRulesForPhoneNumberByNumber(senderNumber).then(rules => {
-      rules.forEach((rule: object) => {
-        switch(rule){
-
+      rules.forEach((rule) => {
+        switch(rule.rule_name_id){
+          case 1: { // Например сирена
+            SirenService.startSiren();
+          }
         }
       });
     })

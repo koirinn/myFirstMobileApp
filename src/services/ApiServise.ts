@@ -1,3 +1,4 @@
+import { PhoneNumberRule } from "../types/PhoneNumberRule";
 class ApiService{
     private static instance : ApiService;
     static getInstance(){
@@ -45,7 +46,7 @@ class ApiService{
             );
             const data = await response.json();
             if (data.success && Array.isArray(data.data)) {
-                return data.data;
+                return data.data as PhoneNumberRule[];
             } else {
                 return [];
             }
