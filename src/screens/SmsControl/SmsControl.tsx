@@ -268,6 +268,7 @@ import { RootStackParamList } from '../../navigation/types';
 import { styles } from './SmsControl.styles';
 import BottomBar from '../../components/BottomBar/BottomBar';
 import * as SmsWatcher from 'react-native-sms-watcher';
+import ApiServise from '../../services/ApiServise';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -289,39 +290,15 @@ const SmsControl: React.FC = () => {
         try {
             setIsLoading(true);
             setError(null);
-            
-            const userId = 1;
-            const url = `http://89.111.169.247/api/mobileapp/phoneNumber/findAllNumbersByUserId/${userId}`;
-            console.log('Отправляю запрос на:', url);
-            
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-            });
-
-            if (response.ok && response.status === 200) {
-                const data = await response.json();
-                console.log('Данные получены:', data);
-                const numbersList: PhoneNumberItem[] = data.data || [];
-                setSmsList(numbersList);
-                
-                // Устанавливаем номера для отслеживания SMS
-                const phoneNumbers = numbersList.map((item: PhoneNumberItem) => item.phone_number);
-                SmsWatcher.setWatchedNumbers(phoneNumbers);
-                console.log('Установлены отслеживаемые номера:', phoneNumbers);
-            } else if (response.status >= 400 && response.status < 500) {
-                setError('Ошибка при загрузке данных. Проверьте авторизацию.');
-                console.error('Client error:', response.status);
-            } else {
-                setError('Ошибка сервера. Попробуйте позже.');
-                console.error('Server error:', response.status);
-            }
+            const numbersList: PhoneNumberItem[] = await ApiServise.fetchPhoneNumbers() || [];
+            setSmsList(numbersList);
+            // Устанавливаем номера для отслеживания SMS
+            const phoneNumbers = numbersList.map((item: PhoneNumberItem) => item.phone_number);
+            SmsWatcher.setWatchedNumbers(phoneNumbers);
+            console.log('Установлены отслеживаемые номера:', phoneNumbers);
         } catch (error) {
             console.error('Fetch error:', error);
-            setError('Ошибка соединения с сервером');
+            setError(error instanceof Error ? error.message : 'Ошибка соединения с сервером');
         } finally {
             setIsLoading(false);
         }
@@ -346,30 +323,14 @@ const SmsControl: React.FC = () => {
 
     const handleDeleteItem = async (id: number) => {
         try {
-            const response = await fetch(
-                `http://89.111.169.247/api/mobileapp/phoneNumber/deleteNumber/${id}`,
-                {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                }
-            );
-
-            if (response.ok && response.status === 200) {
-                setSmsList(prevList => prevList.filter(item => item.id !== id));
-                Alert.alert('Успешно', 'Номер удален');
-                // После удаления обновляем список и переустанавливаем наблюдаемые номера
-                fetchPhoneNumbers();
-            } else if (response.status >= 400 && response.status < 500) {
-                Alert.alert('Ошибка', 'Не удалось удалить номер');
-            } else {
-                Alert.alert('Ошибка сервера', 'Попробуйте позже');
-            }
+            await ApiServise.fetchDeleteNumber(id);
+            setSmsList(prevList => prevList.filter(item => item.id !== id));
+            Alert.alert('Успешно', 'Номер удален');
+            // После удаления обновляем список и переустанавливаем наблюдаемые номера
+            fetchPhoneNumbers();
         } catch (error) {
             console.error('Delete error:', error);
-            Alert.alert('Ошибка', 'Не удалось соединиться с сервером');
+            Alert.alert('Ошибка', error instanceof Error ? error.message : 'Не удалось соединиться с сервером');
         }
     };
 
