@@ -83,7 +83,7 @@ class ApiService{
         }
     };
 
-    fetchAllNumberRules = async (id: number, ruleName: string) => {
+    fetchAllNumberRules = async () => {
         const response = await fetch(
             'http://89.111.169.247/api/mobileapp/phoneNumber/findAllNumbersRules',
             {

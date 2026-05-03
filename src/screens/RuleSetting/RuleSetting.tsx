@@ -423,6 +423,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { styles } from './RuleSetting.styles';
 import BottomBar from '../../components/BottomBar/BottomBar';
+import ApiServise from '../../services/ApiServise';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type RouteProps = {
@@ -483,32 +484,16 @@ const RuleSetting: React.FC = () => {
             try {
                 setIsLoadingRules(true);
                 setRulesError(null);
-                const response = await fetch(
-                    'http://89.111.169.247/api/mobileapp/phoneNumber/findAllNumbersRules',
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                        },
-                    }
-                );
 
-                if (response.ok && response.status === 200) {
-                    const data = await response.json();
-                    if (data.success && Array.isArray(data.data)) {
-                        // Приводим id к числу
-                        setRules(data.data.map((rule: any) => ({
-                            id: Number(rule.id),
-                            rule_name: rule.rule_name
-                        })));
-                    } else {
-                        setRulesError('Некорректный формат данных');
-                    }
-                } else if (response.status >= 400 && response.status < 500) {
-                    setRulesError('Ошибка загрузки правил');
+                const data = await ApiServise.fetchAllNumberRules();
+                if (data.success && Array.isArray(data.data)) {
+                    // Приводим id к числу
+                    setRules(data.data.map((rule: any) => ({
+                        id: Number(rule.id),
+                        rule_name: rule.rule_name
+                    })));
                 } else {
-                    setRulesError('Ошибка сервера');
+                    setRulesError('Некорректный формат данных');
                 }
             } catch (error) {
                 console.error('Fetch rules error:', error);

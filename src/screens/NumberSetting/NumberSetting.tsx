@@ -385,6 +385,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { styles } from './NumberSetting.styles';
 import BottomBar from '../../components/BottomBar/BottomBar';
+import ApiServise from '../../services/ApiServise';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type RouteProps = {
@@ -433,22 +434,7 @@ const NumberSetting: React.FC = () => {
     const fetchRulesForPhoneNumber = async (phoneNumberId: number) => {
         try {
             setIsLoadingRules(true);
-            const response = await fetch(
-                `http://89.111.169.247/api/mobileapp/phoneNumber/findRulesByPhoneNumberId/${phoneNumberId}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                }
-            );
-            const data = await response.json();
-            if (data.success && Array.isArray(data.data)) {
-                setRules(data.data);
-            } else {
-                setRules([]);
-            }
+            setRules(await ApiServise.fetchRulesForPhoneNumber(phoneNumberId) || []);
         } catch (error) {
             console.error('Ошибка загрузки правил:', error);
             setRules([]);
