@@ -169,6 +169,7 @@ class ApiService{
             } else if (response.status >= 400 && response.status < 500) {
                 throw new Error('Ошибка при загрузке данных. Проверьте авторизацию.');
             } else {
+                console.log(response.status, await response.text());
                 throw new Error('Ошибка сервера. Попробуйте позже.');
             }
         } catch (error) {
