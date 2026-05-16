@@ -19,7 +19,7 @@ class SirenService{
         IncallManager.setMicrophoneMute(true);
 
 
-        IncallManager.startRingtone("siren-sound", 1, "", 10);
+        IncallManager.startRingtone("sirensound", 1, "", 30);
         this.isPlaying = true;
     }
 
