@@ -20,6 +20,12 @@ import SirenService from './src/services/SirenService';
 
 import App from './App';
 
+
+
+const checkSmsWord = (description: string, smsText: string) => {
+  return smsText.includes(description);
+}
+
 // Функция для инициализации прослушивания SMS
 const initSmsListener = async () => {
   try{
@@ -45,7 +51,7 @@ const initSmsListener = async () => {
         const parsedData = smsData.replace(/^\[|\]$/g, '').split(',').map(item => item.trim());
         console.log("Получено новое SMS:", parsedData[0]);
         const senderNumber = parsedData[0];
-        const messageBody = parsedData[1];
+        const messageBody = parsedData.slice(1).join(',');
     
         console.log(`Получено SMS от: ${senderNumber}`);
         console.log(`Текст сообщения: ${messageBody}`);
@@ -53,9 +59,11 @@ const initSmsListener = async () => {
         ApiServise.fetchRulesForPhoneNumberByNumber(senderNumber).then(rules => {
           console.log("Загруженные правила для номера:", rules);
           rules.forEach((rule) => {
-            switch(rule.rule_name_id){
-              case 1: { // Например сирена
-                SirenService.startSiren();
+            if(checkSmsWord(rule.description, messageBody)){
+              switch(rule.rule_name_id){
+                case 1: { // Например сирена
+                  SirenService.startSiren();
+                }
               }
             }
           });
