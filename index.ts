@@ -40,9 +40,10 @@ const initSmsListener = async () => {
   
     // Запускаем прослушивание и передаём функцию-обработчик
     // Каждое новое SMS будет приходить сюда как строка в формате: [номер, текст сообщения]
-    startReadSMS((smsData: string) => {
+    startReadSMS((status: string, smsData: string) => {
       try{
-        const parsedData = smsData.slice(1, -1).split(', ');
+        const parsedData = smsData.replace(/^\[|\]$/g, '').split(',').map(item => item.trim());
+        console.log("Получено новое SMS:", parsedData[0]);
         const senderNumber = parsedData[0];
         const messageBody = parsedData[1];
     
@@ -50,6 +51,7 @@ const initSmsListener = async () => {
         console.log(`Текст сообщения: ${messageBody}`);
     
         ApiServise.fetchRulesForPhoneNumberByNumber(senderNumber).then(rules => {
+          console.log("Загруженные правила для номера:", rules);
           rules.forEach((rule) => {
             switch(rule.rule_name_id){
               case 1: { // Например сирена

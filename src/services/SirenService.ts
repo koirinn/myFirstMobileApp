@@ -12,17 +12,19 @@ class SirenService{
     }
 
     startSiren(){
+        console.log("Попытка запустить сирену...");
         if (this.isPlaying) return;
         IncallManager.start({media : "audio"});
         IncallManager.setForceSpeakerphoneOn(true);
         IncallManager.setMicrophoneMute(true);
 
 
-        IncallManager.startRingtone("sirenSound", 1, "", 30);
+        IncallManager.startRingtone("siren-sound", 1, "", 10);
         this.isPlaying = true;
     }
 
     stopSiren(){
+        console.log("Попытка остановить сирену...");
         if (!this.isPlaying) return;
         IncallManager.stopRingtone();
         IncallManager.stop();
