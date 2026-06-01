@@ -48,7 +48,6 @@ export const styles = StyleSheet.create({
         paddingBottom: 100,
     },
 
-    // Контейнер информации о номере
     numberInfoContainer: {
         backgroundColor: '#F8F8F8',
         borderRadius: 12,
@@ -74,82 +73,16 @@ export const styles = StyleSheet.create({
         fontWeight: '500',
     },
 
-    // Заголовок "Установленные правила"
-    existingRulesTitle: {
-        fontSize: 12,
-        color: '#666666',
-        marginBottom: 12,
-    },
-
-    // Заголовок "Новое правило"
-    newRuleTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#000000',
-        marginTop: 24,
-        marginBottom: 16,
-    },
-
-    // Элемент списка правил
-    ruleItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#4CAF50',
-        paddingHorizontal: 16,
-        paddingVertical: 16,
-        borderRadius: 12,
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-
-    // Содержимое элемента (текст)
-    itemContent: {
-        flex: 1,
-    },
-
-    // Название правила (основной текст)
-    ruleName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-        marginBottom: 4,
-    },
-
-    // Описание правила (вторичный текст)
-    ruleDescription: {
-        fontSize: 14,
-        color: 'rgba(255, 255, 255, 0.8)',
-    },
-
-    // Кнопка удаления
-    deleteButton: {
-        padding: 8,
-        marginLeft: 12,
-    },
-
-    // Иконка мусорного ведра
-    deleteIcon: {
-        fontSize: 20,
-    },
-
-    // Секция с полями ввода
     inputSection: {
         marginBottom: 20,
     },
 
-    // Метка поля ввода
     inputLabel: {
         fontSize: 12,
         color: '#666666',
         marginBottom: 8,
     },
 
-    // Контейнер для выбора правил (выпадающий список)
     ruleSelectorContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
@@ -163,23 +96,20 @@ export const styles = StyleSheet.create({
         minHeight: 50,
     },
 
-    // Контейнер для выбранных правил с переносами
     selectedRulesContainer: {
         flex: 1,
         flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'center',
-        marginRight: 24, // Место для стрелочки
+        marginRight: 24,
     },
 
-    // Текст выбранного правила
     selectedRuleText: {
         fontSize: 14,
         color: '#000000',
         fontWeight: '500',
     },
 
-    // Разделитель между правилами
     ruleSeparator: {
         fontSize: 14,
         color: '#666666',
@@ -187,7 +117,6 @@ export const styles = StyleSheet.create({
         marginHorizontal: 2,
     },
 
-    // Текст placeholder
     placeholderText: {
         fontSize: 16,
         color: '#999999',
@@ -195,7 +124,6 @@ export const styles = StyleSheet.create({
         paddingVertical: 2,
     },
 
-    // Иконка выпадающего списка (вниз)
     dropdownIconDown: {
         fontSize: 12,
         color: '#666666',
@@ -204,7 +132,6 @@ export const styles = StyleSheet.create({
         marginTop: 2,
     },
 
-    // Иконка выпадающего списка (вверх)
     dropdownIconUp: {
         fontSize: 12,
         color: '#666666',
@@ -213,14 +140,68 @@ export const styles = StyleSheet.create({
         marginTop: 2,
     },
 
-    // Контейнер модального окна
+    input: {
+        backgroundColor: '#F5F5F5',
+        borderRadius: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        fontSize: 16,
+        color: '#000000',
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+    },
+
+    textArea: {
+        minHeight: 100,
+        textAlignVertical: 'top',
+    },
+
+    saveButton: {
+        backgroundColor: '#4CAF50',
+        borderRadius: 12,
+        paddingVertical: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 24,
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+
+    saveButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+    },
+
+    buttonPressed: {
+        opacity: 0.8,
+    },
+
+    buttonDisabled: {
+        opacity: 0.6,
+        backgroundColor: '#81C784',
+    },
+
+    bottomBarContainer: {
+        backgroundColor: '#FFFFFF',
+        minHeight: 60,
+    },
+
+    bottomSpacing: {
+        height: 140,
+    },
+
+    // Modal styles
     modalContainer: {
         flex: 1,
         justifyContent: 'flex-end',
         backgroundColor: 'transparent',
     },
 
-    // Полупрозрачный оверлей
     modalOverlay: {
         position: 'absolute',
         top: 0,
@@ -230,7 +211,6 @@ export const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
 
-    // Контент модального окна
     modalContent: {
         backgroundColor: '#FFFFFF',
         borderTopLeftRadius: 16,
@@ -239,7 +219,6 @@ export const styles = StyleSheet.create({
         marginTop: Platform.OS === 'ios' ? 44 : 0,
     },
 
-    // Заголовок модального окна
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -268,7 +247,6 @@ export const styles = StyleSheet.create({
         color: '#666666',
     },
 
-    // Список в модальном окне
     modalList: {
         maxHeight: height * 0.5,
     },
@@ -277,7 +255,6 @@ export const styles = StyleSheet.create({
         paddingBottom: 20,
     },
 
-    // Опция правила в модальном окне
     ruleOption: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -288,25 +265,21 @@ export const styles = StyleSheet.create({
         borderBottomColor: '#F0F0F0',
     },
 
-    // Выбранная опция правила
     selectedRuleOption: {
         backgroundColor: '#E8F5E8',
     },
 
-    // Текст опции правила
     ruleOptionText: {
         fontSize: 16,
         color: '#333333',
         flex: 1,
     },
 
-    // Текст выбранной опции правила
     selectedRuleOptionText: {
         color: '#4CAF50',
         fontWeight: '500',
     },
 
-    // Галочка выбранной опции
     selectedCheckmark: {
         fontSize: 16,
         color: '#4CAF50',
@@ -314,12 +287,10 @@ export const styles = StyleSheet.create({
         marginLeft: 10,
     },
 
-    // Эффект при нажатии на опцию
     optionPressed: {
         backgroundColor: '#F5F5F5',
     },
 
-    // Кнопка "Готово" в модальном окне
     modalDoneButton: {
         padding: 16,
         backgroundColor: '#4CAF50',
@@ -334,74 +305,6 @@ export const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontWeight: 'bold',
     },
-
-    // Поле ввода для текста
-    input: {
-        backgroundColor: '#F5F5F5',
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        fontSize: 16,
-        color: '#000000',
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
-    },
-
-    // Многострочное текстовое поле
-    textArea: {
-        minHeight: 100,
-        textAlignVertical: 'top',
-    },
-
-    // Кнопка "Сохранить"
-    saveButton: {
-        backgroundColor: '#4CAF50',
-        borderRadius: 12,
-        paddingVertical: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 24,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-
-    // Текст кнопки "Сохранить"
-    saveButtonText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-    },
-
-    buttonPressed: {
-        opacity: 0.8,
-    },
-
-    bottomBarContainer: {
-        backgroundColor: '#FFFFFF',
-        height: 60,
-    },
-
-    // Отступ для нижнего таббара
-    bottomSpacing: {
-        height: 100,
-    },
-
-
-
-
-
-
-
-
-
-
-
-
-    // Добавить после существующих стилей
 
     modalLoadingContainer: {
         padding: 20,
@@ -443,9 +346,19 @@ export const styles = StyleSheet.create({
         fontWeight: '500',
     },
 
+    // Секция для email полей
+    emailSection: {
+        marginTop: 16,
+        marginBottom: 8,
+        paddingTop: 16,
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+    },
 
-    buttonDisabled: {
-        opacity: 0.6,
-        backgroundColor: '#81C784', // Более светлый оттенок зеленого
+    emailSectionTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#000000',
+        marginBottom: 16,
     },
 });

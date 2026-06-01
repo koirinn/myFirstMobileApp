@@ -1,15 +1,5 @@
-// import { registerRootComponent } from 'expo';
-
-// import App from './App';
-
-// registerRootComponent(App);
-
-
-
-
-
 import { registerRootComponent } from 'expo';
-import { AppRegistry, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import {
   checkIfHasSMSPermission,
   requestReadSMSPermission,
@@ -17,25 +7,84 @@ import {
 } from '@maniac-tech/react-native-expo-read-sms';
 import ApiServise from './src/services/ApiServise';
 import SirenService from './src/services/SirenService';
+import SmsSendService from "./src/services/SmsSendService";
+import EmailSendService from './src/services/EmailSendService';
 
 import App from './App';
-
-
 
 const checkSmsWord = (description: string, smsText: string) => {
   return smsText.includes(description);
 }
 
+// Функция для получения email данных по rule_id
+const fetchEmailDataByRuleId = async (ruleId: number) => {
+  try {
+    const response = await fetch(
+      `http://89.111.169.247/api/mobileapp/phoneNumber/getPhoneEmailsByRuleId/${ruleId}`
+    );
+    const data = await response.json();
+    
+    if (data.success && data.data && data.data.length > 0) {
+      const emailInfo = data.data[0];
+      return {
+        email: emailInfo.email,
+        subject: emailInfo.theme,
+        body: emailInfo.description
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Ошибка загрузки email данных:', error);
+    return null;
+  }
+};
+
+
+const fetchSmsDataByRuleId = async (ruleId: number) => {
+
+  try {
+
+    const response = await fetch(
+      `http://89.111.169.247/api/mobileapp/phoneNumber/getPhoneSmsByRuleId/${ruleId}`
+    );
+
+    const data = await response.json();
+
+    if (
+      data.success &&
+      data.data &&
+      data.data.length > 0
+    ) {
+
+      const smsInfo = data.data[0];
+
+      return {
+        phone: smsInfo.phone,
+        text: smsInfo.text
+      };
+    }
+
+    return null;
+
+  } catch (error) {
+
+    console.error(
+      'Ошибка загрузки SMS данных:',
+      error
+    );
+
+    return null;
+  }
+};
+
 // Функция для инициализации прослушивания SMS
 const initSmsListener = async () => {
-  try{
-
+  try {
     console.log("Инициализация прослушивания SMS...");
-    // Проверяем, есть ли уже разрешения
+    
     const { hasReceiveSmsPermission, hasReadSmsPermission } =
       await checkIfHasSMSPermission();
   
-    // Если разрешений нет, запрашиваем их
     if (!hasReceiveSmsPermission || !hasReadSmsPermission) {
       const granted = await requestReadSMSPermission();
       if (!granted) {
@@ -44,38 +93,74 @@ const initSmsListener = async () => {
       }
     }
   
-    // Запускаем прослушивание и передаём функцию-обработчик
-    // Каждое новое SMS будет приходить сюда как строка в формате: [номер, текст сообщения]
-    startReadSMS((status: string, smsData: string) => {
-      try{
+    startReadSMS(async (status: string, smsData: string) => {
+      try {
         const parsedData = smsData.replace(/^\[|\]$/g, '').split(',').map(item => item.trim());
-        console.log("Получено новое SMS:", parsedData[0]);
         const senderNumber = parsedData[0];
         const messageBody = parsedData.slice(1).join(',');
     
         console.log(`Получено SMS от: ${senderNumber}`);
         console.log(`Текст сообщения: ${messageBody}`);
     
-        ApiServise.fetchRulesForPhoneNumberByNumber(senderNumber).then(rules => {
-          console.log("Загруженные правила для номера:", rules);
-          rules.forEach((rule) => {
-            if(checkSmsWord(rule.description, messageBody)){
-              switch(rule.rule_name_id){
-                case 1: { // Например сирена
-                  SirenService.startSiren();
+        const rules = await ApiServise.fetchRulesForPhoneNumberByNumber(senderNumber);
+        console.log("Загруженные правила для номера:", rules);
+        
+        for (const rule of rules) {
+          if (checkSmsWord(rule.description, messageBody)) {
+            console.log(`Сработало правило: ${rule.rule_name_id}`);
+            
+            switch(rule.rule_name_id) {
+              case 1: { // запуск сирены
+                console.log("🔊 Запуск сирены...");
+                SirenService.startSiren();
+                break;
+              }
+              case 2: { // отправка email
+                console.log("📧 Загрузка данных для отправки email...");
+                const emailData = await fetchEmailDataByRuleId(rule.id);
+                
+                if (emailData) {
+                  console.log(`Отправка email на: ${emailData.email}`);
+                  await EmailSendService.sendEmail(
+                    emailData.email,
+                    emailData.subject,
+                    emailData.body
+                  );
+                } else {
+                  console.error("Не найдены email данные для правила:", rule.id);
                 }
+                break;
+              }
+              case 3: {
+                console.log("📱 Загрузка SMS настроек...");
+
+                const smsData =
+                  await fetchSmsDataByRuleId(rule.id);
+                if (smsData) {
+                  console.log(
+                    `Отправка SMS на ${smsData.phone}`
+                  );
+                  await SmsSendService.sendSms(
+                    smsData.phone,
+                    smsData.text
+                  );
+                } else {
+                  console.error(
+                    "Не найдены SMS настройки для правила:",
+                    rule.id
+                  );
+                }
+                break;
+              }
+              default: {
+                console.log(`Неизвестный тип правила: ${rule.rule_name_id}`);
               }
             }
-          });
-        }).catch(err => console.error("Ошибка загрузки правил:", err));
+          }
+        }
       } catch (err) {
         console.error("Ошибка обработки SMS:", err);
       }
-      // smsData имеет формат: '[+79001234567, текст сообщения]'
-  
-      // ЗДЕСЬ БУДЕТ ВАША ЛОГИКА ОБРАБОТКИ SMS
-      // Нужно будет загрузить номера и правила, проверить отправителя и текст,
-      // и выполнить нужное действие.
     });
   } catch (err) {
     console.error("Ошибка инициализации SMS слушателя:", err);
@@ -83,9 +168,8 @@ const initSmsListener = async () => {
 };
 
 // Вызываем функцию инициализации при старте приложения
-// if (Platform.OS === 'android') {
+if (Platform.OS === 'android') {
   initSmsListener();
-// }
+}
 
-// Регистрируем корневой компонент приложения
 registerRootComponent(App);
