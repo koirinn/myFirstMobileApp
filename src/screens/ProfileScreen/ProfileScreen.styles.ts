@@ -1,114 +1,3 @@
-// import { StyleSheet } from 'react-native';
-
-// export const styles = StyleSheet.create({
-//   // Главный контейнер
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#4CAF50',
-//   },
-  
-//   // Верхний заголовок
-//   header: {
-//     height: 60,
-//     backgroundColor: '#4CAF50',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-  
-//   // Текст заголовка
-//   headerText: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     color: '#FFFFFF',
-//   },
-  
-//   // Основной контент
-//   content: {
-//     flex: 1,
-//     backgroundColor: '#FFFFFF',
-//   },
-  
-//   // Контент внутри ScrollView
-//   scrollContent: {
-//     paddingVertical: 16,
-//     paddingHorizontal: 16,
-//     alignItems: 'center',
-//   },
-  
-//   // Заглушка аватара (круглая)
-//   avatarPlaceholder: {
-//     width: 120,
-//     height: 120,
-//     borderRadius: 60,
-//     backgroundColor: '#E0E0E0',
-//     marginBottom: 16,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-  
-//   // Текст внутри аватара (инициалы или что-то подобное)
-//   avatarText: {
-//     fontSize: 36,
-//     fontWeight: 'bold',
-//     color: '#666666',
-//   },
-  
-//   // Номер телефона пользователя
-//   phoneNumber: {
-//     fontSize: 18,
-//     color: '#333333',
-//     marginBottom: 32,
-//     fontWeight: '500',
-//   },
-  
-//   // Функциональная кнопка (Pressable)
-//   functionButton: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#4CAF50',
-//     paddingHorizontal: 16,
-//     paddingVertical: 12,
-//     borderRadius: 12,
-//     marginBottom: 12,
-//     width: '100%',
-    
-//     // Тень для iOS
-//     shadowColor: '#000',
-//     shadowOffset: { width: 0, height: 2 },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 4,
-    
-//     // Тень для Android
-//     elevation: 2,
-//   },
-  
-//   // Круглая иконка-заглушка
-//   buttonIcon: {
-//     width: 40,
-//     height: 40,
-//     borderRadius: 20,
-//     backgroundColor: '#FFFFFF',
-//   },
-  
-//   // Текст кнопки
-//   buttonText: {
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//     color: '#FFFFFF',
-//     marginLeft: 12,
-//   },
-  
-//   // Эффект при нажатии (для iOS)
-//   buttonPressed: {
-//     opacity: 0.8,
-//   },
-// });
-
-
-
-
-
-
 import { StyleSheet, Dimensions } from 'react-native';
 
 // Получаем размеры экрана для адаптивного дизайна
@@ -213,5 +102,131 @@ export const styles = StyleSheet.create({
         backgroundColor: '#F5F5F5',
         borderRadius: 8,
         marginBottom: 12,
+    },
+
+
+
+
+    authBlock: {
+        marginBottom: 20,
+        padding: 16,
+        backgroundColor: '#F5F5F5',
+        borderRadius: 12,
+    },
+
+    authTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 12,
+        color: '#333',
+    },
+
+    authButton: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: 12,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+
+    authButtonSecondary: {
+        backgroundColor: '#2E7D32',
+    },
+
+    authButtonText: {
+        color: '#fff',
+        fontWeight: '600',
+        fontSize: 14,
+    },
+
+
+
+
+    // ===== Профиль авторизованного пользователя =====
+
+    userCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 20,
+        alignItems: 'center',
+        marginBottom: 16,
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+
+        elevation: 2,
+    },
+
+    avatar: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: '#E0E0E0',
+        marginBottom: 12,
+    },
+
+    userName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#000000',
+        marginBottom: 6,
+    },
+
+    userEmail: {
+        fontSize: 14,
+        color: '#666666',
+        marginBottom: 8,
+    },
+
+    userStatus: {
+        fontSize: 14,
+        color: '#4CAF50',
+        fontWeight: '600',
+    },
+
+    logoutButton: {
+        backgroundColor: '#F44336',
+        borderRadius: 12,
+        paddingVertical: 14,
+        alignItems: 'center',
+        marginTop: 20,
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+
+        elevation: 2,
+    },
+
+    logoutText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+
+
+
+    deleteAccountButton: {
+        backgroundColor: '#B71C1C',
+        borderRadius: 12,
+        paddingVertical: 14,
+        alignItems: 'center',
+        marginTop: 12,
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+
+        elevation: 2,
+    },
+
+    deleteAccountText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });

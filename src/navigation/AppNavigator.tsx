@@ -8,6 +8,8 @@ import SettingsScreen from '../screens/SettingsScreen/SettingsScreen';
 import SmsControl from '../screens/SmsControl/SmsControl';
 import NumberSetting from '../screens/NumberSetting/NumberSetting';
 import RuleSetting from '../screens/RuleSetting/RuleSetting';
+import LoginScreen from '../screens/LoginScreen/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen/RegisterScreen';
 
 // Создаем навигатор для работы со стеком экранов
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -28,6 +30,8 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen name="SmsControl" component={SmsControl} />
                 <Stack.Screen name="NumberSetting" component={NumberSetting} />
                 <Stack.Screen name="RuleSetting" component={RuleSetting} />
+                <Stack.Screen name="LoginScreen" component={LoginScreen}/>
+                <Stack.Screen name="RegisterScreen" component={RegisterScreen}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

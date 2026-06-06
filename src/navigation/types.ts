@@ -22,6 +22,8 @@ export type RootStackParamList = {
         ruleCondition?: string;
         ruleNameId?: number;
     };
+    LoginScreen: undefined;
+    RegisterScreen: undefined;
 };
 
 // Экспортируем тип для использования в компонентах

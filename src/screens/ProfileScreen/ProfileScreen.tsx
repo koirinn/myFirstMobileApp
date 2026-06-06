@@ -1,95 +1,4 @@
-// import React, { useState } from 'react';
-// import {
-//     View,
-//     Text,
-//     ScrollView,
-//     Pressable,
-//     // Убираем стандартный SafeAreaView
-// } from 'react-native';
-// import { useSafeAreaInsets } from 'react-native-safe-area-context'; // Импортируем хук
-// import { styles } from './ProfileScreen.styles';
-// import BottomBar from '../../components/BottomBar/BottomBar';
-
-// const ProfileScreen: React.FC = () => {
-//     const [currentScreen, setCurrentScreen] = useState<string>('Profile');
-//     // Хук useSafeAreaInsets возвращает объект с отступами (top, right, bottom, left)
-//     // Эти значения автоматически рассчитываются для камеры, статус-бара и т.д.
-//     const insets = useSafeAreaInsets();
-
-//     const handleFunctionButtonPress = (buttonName: string) => {
-//         console.log(`Нажата кнопка: ${buttonName}`);
-//     };
-
-//     const handleTabPress = (tabName: string) => {
-//         console.log(`Переход на ${tabName}`);
-//         setCurrentScreen(tabName);
-//     };
-
-//     const functionButtons = [
-//         { id: 1, title: 'Настройка профиля 1' },
-//         { id: 2, title: 'Настройка профиля 2' },
-//         { id: 3, title: 'Настройка профиля 3' },
-//     ];
-
-//     return (
-//         // 1. Главный контейнер задает цвет фона для статус-бара
-//         <View style={[styles.container, { paddingTop: insets.top }]}>
-//             {/* 2. Заголовок теперь смещен вниз на величину insets.top */}
-//             <View style={styles.header}>
-//                 <Text style={styles.headerText}>Профиль</Text>
-//             </View>
-
-//             {/* 3. Основной контент */}
-//             <ScrollView
-//                 style={styles.content}
-//                 contentContainerStyle={styles.scrollContent}
-//             >
-//                 {functionButtons.map((button) => (
-//                     <Pressable
-//                         key={button.id}
-//                         style={({ pressed }) => [
-//                             styles.functionButton,
-//                             pressed && styles.buttonPressed,
-//                         ]}
-//                         onPress={() => handleFunctionButtonPress(button.title)}
-//                         android_ripple={{ color: 'rgba(0, 0, 0, 0.1)' }}
-//                     >
-//                         <View style={styles.buttonIcon} />
-//                         <Text style={styles.buttonText}>{button.title}</Text>
-//                     </Pressable>
-//                 ))}
-//                 <View style={styles.demoContent}>
-//                     <Text style={styles.demoText}>
-//                         Проблема с камерой и статус-баром решена!
-//                     </Text>
-//                     <View style={styles.placeholder} />
-//                     <View style={styles.placeholder} />
-//                     <View style={styles.placeholder} />
-//                     <View style={styles.placeholder} />
-//                     <View style={styles.placeholder} />
-//                     <View style={styles.placeholder} />
-//                 </View>
-//             </ScrollView>
-
-//             {/* 4. Нижняя навигация. Добавляем отступ снизу, если нужно */}
-//             <View style={{ paddingBottom: insets.bottom }}>
-//                 <BottomBar
-//                     currentScreen={currentScreen}
-//                     onTabPress={handleTabPress}
-//                 />
-//             </View>
-//         </View>
-//     );
-// };
-
-// export default ProfileScreen;
-
-
-
-
-
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -97,14 +6,160 @@ import {
     Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { styles } from './ProfileScreen.styles';
 import BottomBar from '../../components/BottomBar/BottomBar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
+
+
 
 const ProfileScreen: React.FC = () => {
     const insets = useSafeAreaInsets();
+    const navigation = useNavigation<any>();
+
+    // TODO: позже заменить на реальный стейт авторизации (Redux / Context / AsyncStorage)
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+
+    const checkAuth = async () => {
+        try {
+            const token = await AsyncStorage.getItem(
+                'accessToken'
+            );
+
+            if (!token) {
+                setIsLoggedIn(false);
+                return;
+            }
+
+            const payload = JSON.parse(
+                atob(token.split('.')[1])
+            );
+
+            setUsername(payload.username);
+            setIsLoggedIn(true);
+        } catch (error) {
+            console.log(error);
+            setIsLoggedIn(false);
+        }
+    };
+
+    useEffect(() => {
+        checkAuth();
+    }, []);
 
     const handleFunctionButtonPress = (buttonName: string) => {
         console.log(`Нажата кнопка: ${buttonName}`);
+    };
+
+    const handleLogin = () => {
+        console.log("Переход на Login");
+        navigation.navigate('LoginScreen');
+    };
+
+    const handleRegister = () => {
+        console.log("Переход на Register");
+        navigation.navigate('RegisterScreen');
+    };
+
+    const handleLogout = () => {
+        Alert.alert(
+            'Выход из аккаунта',
+            'Вы уверены, что хотите выйти?',
+            [
+                {
+                    text: 'Отмена',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Выйти',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await AsyncStorage.removeItem('accessToken');
+
+                            setIsLoggedIn(false);
+                            setUsername('');
+                            setEmail('');
+
+                            console.log('Выход выполнен');
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    },
+                },
+            ]
+        );
+    };
+
+    const handleDeleteAccount = () => {
+        Alert.alert(
+            'Удаление аккаунта',
+            'Это действие нельзя отменить.\n\nВы уверены, что хотите удалить аккаунт?',
+            [
+                {
+                    text: 'Отмена',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Удалить',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            const token =
+                                await AsyncStorage.getItem(
+                                    'accessToken'
+                                );
+
+                            const response = await fetch(
+                                'http://89.111.169.247/api/mobileapp/users/delete',
+                                {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type':
+                                            'application/json',
+                                        Authorization: `Bearer ${token}`,
+                                    },
+                                }
+                            );
+
+                            const data =
+                                await response.json();
+
+                            if (response.ok) {
+                                await AsyncStorage.removeItem(
+                                    'accessToken'
+                                );
+
+                                setIsLoggedIn(false);
+                                setUsername('');
+                                setEmail('');
+
+                                Alert.alert(
+                                    'Готово',
+                                    'Аккаунт успешно удалён'
+                                );
+                            } else {
+                                Alert.alert(
+                                    'Ошибка',
+                                    data.error ||
+                                        'Не удалось удалить аккаунт'
+                                );
+                            }
+                        } catch (error) {
+                            console.error(error);
+
+                            Alert.alert(
+                                'Ошибка',
+                                'Ошибка соединения с сервером'
+                            );
+                        }
+                    },
+                },
+            ]
+        );
     };
 
     const functionButtons = [
@@ -123,34 +178,92 @@ const ProfileScreen: React.FC = () => {
                 style={styles.content}
                 contentContainerStyle={styles.scrollContent}
             >
-                {functionButtons.map((button) => (
+                {/* ===== НЕАВТОРИЗОВАН ===== */}
+                {!isLoggedIn && (
+                    <View style={styles.authBlock}>
+                        <Text style={styles.authTitle}>
+                            Вы не вошли в аккаунт
+                        </Text>
+
+                        <Pressable
+                            style={styles.authButton}
+                            onPress={handleLogin}
+                        >
+                            <Text style={styles.authButtonText}>
+                                Войти
+                            </Text>
+                        </Pressable>
+
+                        <Pressable
+                            style={[styles.authButton, styles.authButtonSecondary]}
+                            onPress={handleRegister}
+                        >
+                            <Text style={styles.authButtonText}>
+                                Зарегистрироваться
+                            </Text>
+                        </Pressable>
+                    </View>
+                )}
+
+                {/* ===== АВТОРИЗОВАН ===== */}
+                {isLoggedIn && (
+                <>
+                    <View style={styles.userCard}>
+                        <View style={styles.avatar} />
+
+                        <Text style={styles.userName}>
+                            {username}
+                        </Text>
+
+                        <Text style={styles.userEmail}>
+                            {email}
+                        </Text>
+
+                        <Text style={styles.userStatus}>
+                            Пользователь авторизован
+                        </Text>
+                    </View>
+
+                    {functionButtons.map((button) => (
+                        <Pressable
+                            key={button.id}
+                            style={({ pressed }) => [
+                                styles.functionButton,
+                                pressed && styles.buttonPressed,
+                            ]}
+                            onPress={() =>
+                                handleFunctionButtonPress(button.title)
+                            }
+                        >
+                            <View style={styles.buttonIcon} />
+                            <Text style={styles.buttonText}>
+                                {button.title}
+                            </Text>
+                        </Pressable>
+                    ))}
+
                     <Pressable
-                        key={button.id}
-                        style={({ pressed }) => [
-                            styles.functionButton,
-                            pressed && styles.buttonPressed,
-                        ]}
-                        onPress={() => handleFunctionButtonPress(button.title)}
-                        android_ripple={{ color: 'rgba(0, 0, 0, 0.1)' }}
+                        style={styles.logoutButton}
+                        onPress={handleLogout}
                     >
-                        <View style={styles.buttonIcon} />
-                        <Text style={styles.buttonText}>{button.title}</Text>
+                        <Text style={styles.logoutText}>
+                            Выйти из аккаунта
+                        </Text>
                     </Pressable>
-                ))}
-                {/* <View style={styles.demoContent}>
-                    <Text style={styles.demoText}>
-                        Экран профиля
-                    </Text>
-                    <View style={styles.placeholder} />
-                    <View style={styles.placeholder} />
-                    <View style={styles.placeholder} />
-                    <View style={styles.placeholder} />
-                    <View style={styles.placeholder} />
-                    <View style={styles.placeholder} />
-                </View> */}
+
+                    <Pressable
+                        style={styles.deleteAccountButton}
+                        onPress={handleDeleteAccount}
+                    >
+                        <Text style={styles.deleteAccountText}>
+                            Удалить аккаунт
+                        </Text>
+                    </Pressable>
+                </>
+            )}
+
             </ScrollView>
 
-            {/* Просто рендерим BottomBar без пропсов */}
             <View style={{ paddingBottom: insets.bottom }}>
                 <BottomBar />
             </View>

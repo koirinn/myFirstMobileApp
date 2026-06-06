@@ -379,6 +379,7 @@ import {
     Alert,
     ActivityIndicator,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -468,6 +469,14 @@ const NumberSetting: React.FC = () => {
         try {
             setIsSaving(true);
             setError(null);
+            
+            const token = await AsyncStorage.getItem(
+                'accessToken'
+            );
+
+            if (!token) {
+                throw new Error('NOT_AUTHORIZED');
+            }
 
             let url: string;
             let method: string;
@@ -484,7 +493,7 @@ const NumberSetting: React.FC = () => {
                 url = 'http://89.111.169.247/api/mobileapp/phoneNumber/addNumber';
                 method = 'POST';
                 body = {
-                    user_id: 1,
+                    // user_id: 1,
                     phone_name: numberName.trim(),
                     phone_number: phoneNumber.trim(),
                 };
@@ -497,6 +506,7 @@ const NumberSetting: React.FC = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(body),
             });

@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PhoneNumberRule } from "../types/PhoneNumberRule";
 class ApiService{
     private static instance : ApiService;
@@ -150,15 +151,35 @@ class ApiService{
 
     fetchPhoneNumbers = async () => {
         try {
-            const userId = 1;
-            const url = `http://89.111.169.247/api/mobileapp/phoneNumber/findAllNumbersByUserId/${userId}`;
-            console.log('Отправляю запрос на:', url);
+            // const userId = 1;
+            // const url = `http://89.111.169.247/api/mobileapp/phoneNumber/findAllNumbersByUserId/${userId}`;
+            // console.log('Отправляю запрос на:', url);
             
+            // const response = await fetch(url, {
+            //     method: 'GET',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Accept': 'application/json',
+            //     },
+            // });
+
+            const token = await AsyncStorage.getItem(
+                'accessToken'
+            );
+
+            if (!token) {
+                throw new Error('NOT_AUTHORIZED');
+            }
+
+            const url =
+                'http://89.111.169.247/api/mobileapp/phoneNumber/findAllNumbersByUserId';
+
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    Authorization: `Bearer ${token}`,
                 },
             });
     
