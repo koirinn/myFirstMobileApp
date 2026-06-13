@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
-import { styles } from './NumberSetting.styles';
+import { styles } from './DeviceSetting.styles';
 import BottomBar from '../../components/BottomBar/BottomBar';
 import ApiServise from '../../services/ApiServise';
 
@@ -23,8 +23,12 @@ type RouteProps = {
     name: string;
     params?: {
         id?: number;
-        phone_name?: string;
-        phone_number?: string;
+        device_name?: string;
+        device_phone?: string;
+        code_phrase?: string;
+        code_response?: string;
+        period_minutes?: number;
+        response_interval_minutes?: number;
     };
 };
 
@@ -32,16 +36,22 @@ interface RuleItem {
     id: number;
     ruleName: string;
     description: string;
-    rule_name_id: number; // ID типа правила (из phone_rules_list)
+    rule_name_id: number;
 }
 
-const NumberSetting: React.FC = () => {
+const DeviceSetting: React.FC = () => {
     const insets = useSafeAreaInsets();
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<RouteProps>();
 
-    const [numberName, setNumberName] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
+    // Поля устройства
+    const [deviceName, setDeviceName] = useState('');
+    const [devicePhone, setDevicePhone] = useState('');
+    const [codePhrase, setCodePhrase] = useState('');
+    const [codeResponse, setCodeResponse] = useState('');
+    const [periodMinutes, setPeriodMinutes] = useState('');
+    const [responseIntervalMinutes, setResponseIntervalMinutes] = useState('');
+
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [rules, setRules] = useState<RuleItem[]>([]);
@@ -50,23 +60,33 @@ const NumberSetting: React.FC = () => {
     const isEditing = route.params?.id !== undefined;
     const editingId = route.params?.id;
 
-    // Заполняем поля при получении параметров (для редактирования)
+    // Заполняем поля при редактировании
     useEffect(() => {
-        if (route.params?.phone_name) {
-            setNumberName(route.params.phone_name);
-        }
-        if (route.params?.phone_number) {
-            setPhoneNumber(route.params.phone_number);
-        }
+        if (route.params?.device_name) setDeviceName(route.params.device_name);
+        if (route.params?.device_phone) setDevicePhone(route.params.device_phone);
+        if (route.params?.code_phrase) setCodePhrase(route.params.code_phrase);
+        if (route.params?.code_response) setCodeResponse(route.params.code_response);
+        if (route.params?.period_minutes) setPeriodMinutes(String(route.params.period_minutes));
+        if (route.params?.response_interval_minutes) setResponseIntervalMinutes(String(route.params.response_interval_minutes));
     }, [route.params]);
 
-    // Функция загрузки правил
-    const fetchRulesForPhoneNumber = async (phoneNumberId: number) => {
+    console.log(route.params);7
+
+    // Загрузка правил для устройства
+    const fetchRulesForDevice = async (deviceId: number) => {
         try {
             setIsLoadingRules(true);
-            setRules(await ApiServise.fetchRulesForPhoneNumber(phoneNumberId) || []);
+            const response = await fetch(
+                `http://89.111.169.247/api/mobileapp/device/findRulesByDeviceId/${deviceId}`,
+            );
+            const data = await response.json();
+            if (data.success && Array.isArray(data.data)) {
+                setRules(data.data);
+            } else {
+                setRules([]);
+            }
         } catch (error) {
-            console.error('Ошибка загрузки правил:', error);
+            console.error('Ошибка загрузки правил устройства:', error);
             setRules([]);
         } finally {
             setIsLoadingRules(false);
@@ -76,7 +96,7 @@ const NumberSetting: React.FC = () => {
     // Загружаем правила при первом открытии (если редактирование)
     useEffect(() => {
         if (isEditing && editingId) {
-            fetchRulesForPhoneNumber(editingId);
+            fetchRulesForDevice(editingId);
         }
     }, []);
 
@@ -84,21 +104,31 @@ const NumberSetting: React.FC = () => {
     useFocusEffect(
         useCallback(() => {
             if (isEditing && editingId) {
-                fetchRulesForPhoneNumber(editingId);
+                fetchRulesForDevice(editingId);
             }
         }, [isEditing, editingId])
     );
 
     const handleSave = async () => {
-        if (!numberName.trim() || !phoneNumber.trim()) {
-            Alert.alert('Ошибка', 'Пожалуйста, заполните все поля');
+        if (!deviceName.trim() || !devicePhone.trim() || !codePhrase.trim() || !codeResponse.trim()) {
+            Alert.alert('Ошибка', 'Пожалуйста, заполните обязательные поля (название, телефон, кодовая фраза, кодовый ответ)');
+            return;
+        }
+        const period = parseInt(periodMinutes, 10);
+        const responseInterval = parseInt(responseIntervalMinutes, 10);
+        if (isNaN(period) || period <= 0) {
+            Alert.alert('Ошибка', 'Периодичность отправки должна быть положительным числом (минуты)');
+            return;
+        }
+        if (isNaN(responseInterval) || responseInterval <= 0) {
+            Alert.alert('Ошибка', 'Интервал между запросом и ответом должен быть положительным числом (минуты)');
             return;
         }
 
         try {
             setIsSaving(true);
             setError(null);
-            
+
             const token = await AsyncStorage.getItem(
                 'accessToken'
             );
@@ -112,23 +142,28 @@ const NumberSetting: React.FC = () => {
             let body: any;
 
             if (isEditing && editingId) {
-                url = `http://89.111.169.247/api/mobileapp/phoneNumber/saveNumber/${editingId}`;
+                url = `http://89.111.169.247/api/mobileapp/device/saveDevice/${editingId}`;
                 method = 'PUT';
                 body = {
-                    phone_name: numberName.trim(),
-                    phone_number: phoneNumber.trim(),
+                    device_name: deviceName.trim(),
+                    device_phone: devicePhone.trim(),
+                    code_phrase: codePhrase.trim(),
+                    code_response: codeResponse.trim(),
+                    period_minutes: period,
+                    response_interval_minutes: responseInterval,
                 };
             } else {
-                url = 'http://89.111.169.247/api/mobileapp/phoneNumber/addNumber';
+                url = 'http://89.111.169.247/api/mobileapp/device/addDevice';
                 method = 'POST';
                 body = {
-                    // user_id: 1,
-                    phone_name: numberName.trim(),
-                    phone_number: phoneNumber.trim(),
+                    device_name: deviceName.trim(),
+                    device_phone: devicePhone.trim(),
+                    code_phrase: codePhrase.trim(),
+                    code_response: codeResponse.trim(),
+                    period_minutes: period,
+                    response_interval_minutes: responseInterval,
                 };
             }
-
-            console.log(`${method} запрос на:`, url, body);
 
             const response = await fetch(url, {
                 method,
@@ -141,8 +176,6 @@ const NumberSetting: React.FC = () => {
             });
 
             const responseData = await response.json();
-            console.log('Ответ сервера:', responseData);
-
             if (response.ok && response.status === 200) {
                 navigation.goBack();
             } else if (response.status >= 400 && response.status < 500) {
@@ -164,47 +197,37 @@ const NumberSetting: React.FC = () => {
 
     const handleAddRule = () => {
         if (!isEditing) {
-            Alert.alert('Ошибка', 'Сначала сохраните номер');
+            Alert.alert('Ошибка', 'Сначала сохраните устройство');
             return;
         }
-        if (!numberName.trim() || !phoneNumber.trim()) {
-            Alert.alert('Ошибка', 'Пожалуйста, заполните название и номер телефона');
+        if (!deviceName.trim() || !devicePhone.trim()) {
+            Alert.alert('Ошибка', 'Пожалуйста, заполните название и телефон устройства');
             return;
         }
-
-        const currentId = editingId as number;
-
-        navigation.navigate('RuleSetting', {
-            phoneNumberId: currentId,
-            numberName: numberName.trim(),
-            phoneNumber: phoneNumber.trim(),
+        navigation.navigate('DeviceRuleSetting', {
+            DeviceId: editingId!, // здесь можно использовать deviceId, но для правил устройств нужен отдельный RuleSetting или адаптация
+            DeviceName: deviceName.trim(),
+            DeviceNumber: devicePhone.trim(),
         });
     };
 
     const handleDeleteRule = async (id: number, ruleName: string) => {
         try {
             const response = await fetch(
-                `http://89.111.169.247/api/mobileapp/phoneNumber/deleteRule/${id}`,
+                `http://89.111.169.247/api/mobileapp/device/deleteDeviceRule/${id}`,
                 {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
                     },
                 }
             );
-
             const responseData = await response.json();
-            console.log('Удаление правила, ответ:', responseData);
-
             if (response.ok && response.status === 200) {
-                setRules(prevRules => prevRules.filter(rule => rule.id !== id));
+                setRules(prev => prev.filter(rule => rule.id !== id));
                 Alert.alert('Успешно', `Правило "${ruleName}" удалено`);
-            } else if (response.status >= 400 && response.status < 500) {
-                const errorMessage = responseData.message || 'Ошибка при удалении правила';
-                Alert.alert('Ошибка', errorMessage);
             } else {
-                Alert.alert('Ошибка сервера', 'Попробуйте позже');
+                Alert.alert('Ошибка', responseData.message || 'Не удалось удалить правило');
             }
         } catch (error) {
             console.error('Delete rule error:', error);
@@ -223,7 +246,7 @@ const NumberSetting: React.FC = () => {
                     <Text style={styles.backButtonText}>←</Text>
                 </Pressable>
                 <Text style={styles.headerText}>
-                    {isEditing ? 'Редактирование' : 'Настройка номера'}
+                    {isEditing ? 'Редактирование устройства' : 'Настройка устройства'}
                 </Text>
             </View>
 
@@ -233,24 +256,66 @@ const NumberSetting: React.FC = () => {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.inputSection}>
-                    <Text style={styles.inputLabel}>Название номера</Text>
+                    <Text style={styles.inputLabel}>Название устройства</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Введите название"
                         placeholderTextColor="#999999"
-                        value={numberName}
-                        onChangeText={setNumberName}
+                        value={deviceName}
+                        onChangeText={setDeviceName}
                         editable={!isSaving}
                     />
 
-                    <Text style={styles.inputLabel}>Номер телефона</Text>
+                    <Text style={styles.inputLabel}>Номер телефона устройства</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Введите номер телефона"
                         placeholderTextColor="#999999"
                         keyboardType="phone-pad"
-                        value={phoneNumber}
-                        onChangeText={setPhoneNumber}
+                        value={devicePhone}
+                        onChangeText={setDevicePhone}
+                        editable={!isSaving}
+                    />
+
+                    <Text style={styles.inputLabel}>Кодовая фраза</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Введите кодовую фразу"
+                        placeholderTextColor="#999999"
+                        value={codePhrase}
+                        onChangeText={setCodePhrase}
+                        editable={!isSaving}
+                    />
+
+                    <Text style={styles.inputLabel}>Кодовый ответ</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Введите кодовый ответ"
+                        placeholderTextColor="#999999"
+                        value={codeResponse}
+                        onChangeText={setCodeResponse}
+                        editable={!isSaving}
+                    />
+
+                    <Text style={styles.inputLabel}>Периодичность отправки (в минутах)</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Введите время"
+                        placeholderTextColor="#999999"
+                        keyboardType="numeric"
+                        value={periodMinutes}
+                        onChangeText={setPeriodMinutes}
+                        editable={!isSaving}
+                    />
+
+                    <Text style={styles.inputLabel}>Интервал между запросом и ответом (в минутах)</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Введите время"
+                        placeholderTextColor="#999999"
+                        keyboardType="numeric"
+                        value={responseIntervalMinutes}
+                        onChangeText={setResponseIntervalMinutes}
                         editable={!isSaving}
                     />
                 </View>
@@ -279,7 +344,7 @@ const NumberSetting: React.FC = () => {
                     )}
                 </Pressable>
 
-                <Text style={styles.rulesTitle}>Правила</Text>
+                <Text style={styles.rulesTitle}>Правила для устройства</Text>
 
                 {isLoadingRules ? (
                     <View style={styles.loadingRulesContainer}>
@@ -297,14 +362,13 @@ const NumberSetting: React.FC = () => {
                                 pressed && styles.buttonPressed,
                             ]}
                             onPress={() => {
-                                navigation.navigate('RuleSetting', {
-                                    phoneNumberId: editingId!,
-                                    numberName: numberName,
-                                    phoneNumber: phoneNumber,
-                                    ruleId: item.id,                 // ID записи в phone_rules
+                                navigation.navigate('DeviceRuleSetting', {
+                                    DeviceId: editingId!,
+                                    DeviceName: deviceName,
+                                    DeviceNumber: devicePhone,
+                                    ruleId: item.id,
                                     ruleName: item.ruleName,
-                                    ruleCondition: item.description,
-                                    ruleNameId: item.rule_name_id,   // ID типа правила (ключевое!)
+                                    ruleNameId: item.rule_name_id,
                                 });
                             }}
                         >
@@ -329,11 +393,11 @@ const NumberSetting: React.FC = () => {
                 style={({ pressed }) => [
                     styles.floatingAddButton,
                     { bottom: insets.bottom + 70 },
-                    (!isEditing || !numberName.trim() || !phoneNumber.trim()) && styles.buttonDisabled,
+                    (!isEditing || !deviceName.trim() || !devicePhone.trim()) && styles.buttonDisabled,
                     pressed && styles.buttonPressed,
                 ]}
                 onPress={handleAddRule}
-                disabled={isSaving || !isEditing || !numberName.trim() || !phoneNumber.trim()}
+                disabled={isSaving || !isEditing || !deviceName.trim() || !devicePhone.trim()}
             >
                 <Text style={styles.floatingAddButtonText}>Добавить правило</Text>
                 <Text style={styles.floatingAddIcon}>+</Text>
@@ -346,4 +410,4 @@ const NumberSetting: React.FC = () => {
     );
 };
 
-export default NumberSetting;
+export default DeviceSetting;

@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
-import { styles } from './NumberSetting.styles';
+import { styles } from './EmailSetting.styles';
 import BottomBar from '../../components/BottomBar/BottomBar';
 import ApiServise from '../../services/ApiServise';
 
@@ -23,8 +23,8 @@ type RouteProps = {
     name: string;
     params?: {
         id?: number;
-        phone_name?: string;
-        phone_number?: string;
+        email_name?: string;
+        email_address?: string;
     };
 };
 
@@ -35,13 +35,13 @@ interface RuleItem {
     rule_name_id: number; // ID типа правила (из phone_rules_list)
 }
 
-const NumberSetting: React.FC = () => {
+const EmailSetting: React.FC = () => {
     const insets = useSafeAreaInsets();
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<RouteProps>();
 
-    const [numberName, setNumberName] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [emailName, setEmailName] = useState('');
+    const [emailAddress, setEmailAddress] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [rules, setRules] = useState<RuleItem[]>([]);
@@ -50,23 +50,34 @@ const NumberSetting: React.FC = () => {
     const isEditing = route.params?.id !== undefined;
     const editingId = route.params?.id;
 
+    console.log(isEditing, editingId);
+
     // Заполняем поля при получении параметров (для редактирования)
     useEffect(() => {
-        if (route.params?.phone_name) {
-            setNumberName(route.params.phone_name);
+        if (route.params?.email_name) {
+            setEmailName(route.params.email_name);
         }
-        if (route.params?.phone_number) {
-            setPhoneNumber(route.params.phone_number);
+        if (route.params?.email_address) {
+            setEmailAddress(route.params.email_address);
         }
     }, [route.params]);
 
-    // Функция загрузки правил
-    const fetchRulesForPhoneNumber = async (phoneNumberId: number) => {
+    // Загрузка правил для почтового адреса
+    const fetchRulesForEmail = async (EmailId: number) => {
         try {
             setIsLoadingRules(true);
-            setRules(await ApiServise.fetchRulesForPhoneNumber(phoneNumberId) || []);
+            const response = await fetch(
+                `http://89.111.169.247/api/mobileapp/email/findAllRulesByEmailId/${EmailId}`,
+            );
+            const data = await response.json();
+            console.log(data);
+            if (data.success && Array.isArray(data.data)) {
+                setRules(data.data);
+            } else {
+                setRules([]);
+            }
         } catch (error) {
-            console.error('Ошибка загрузки правил:', error);
+            console.error('Ошибка загрузки правил почтового адреса:', error);
             setRules([]);
         } finally {
             setIsLoadingRules(false);
@@ -76,7 +87,7 @@ const NumberSetting: React.FC = () => {
     // Загружаем правила при первом открытии (если редактирование)
     useEffect(() => {
         if (isEditing && editingId) {
-            fetchRulesForPhoneNumber(editingId);
+            fetchRulesForEmail(editingId);
         }
     }, []);
 
@@ -84,13 +95,13 @@ const NumberSetting: React.FC = () => {
     useFocusEffect(
         useCallback(() => {
             if (isEditing && editingId) {
-                fetchRulesForPhoneNumber(editingId);
+                fetchRulesForEmail(editingId);
             }
         }, [isEditing, editingId])
     );
 
     const handleSave = async () => {
-        if (!numberName.trim() || !phoneNumber.trim()) {
+        if (!emailName.trim() || !emailAddress.trim()) {
             Alert.alert('Ошибка', 'Пожалуйста, заполните все поля');
             return;
         }
@@ -112,19 +123,19 @@ const NumberSetting: React.FC = () => {
             let body: any;
 
             if (isEditing && editingId) {
-                url = `http://89.111.169.247/api/mobileapp/phoneNumber/saveNumber/${editingId}`;
+                url = `http://89.111.169.247/api/mobileapp/email/saveEmail/${editingId}`;
                 method = 'PUT';
                 body = {
-                    phone_name: numberName.trim(),
-                    phone_number: phoneNumber.trim(),
+                    email_name: emailName.trim(),
+                    email_address: emailAddress.trim(),
                 };
             } else {
-                url = 'http://89.111.169.247/api/mobileapp/phoneNumber/addNumber';
+                url = 'http://89.111.169.247/api/mobileapp/email/addEmail';
                 method = 'POST';
                 body = {
                     // user_id: 1,
-                    phone_name: numberName.trim(),
-                    phone_number: phoneNumber.trim(),
+                    email_name: emailName.trim(),
+                    email_address: emailAddress.trim(),
                 };
             }
 
@@ -164,27 +175,27 @@ const NumberSetting: React.FC = () => {
 
     const handleAddRule = () => {
         if (!isEditing) {
-            Alert.alert('Ошибка', 'Сначала сохраните номер');
+            Alert.alert('Ошибка', 'Сначала сохраните email');
             return;
         }
-        if (!numberName.trim() || !phoneNumber.trim()) {
-            Alert.alert('Ошибка', 'Пожалуйста, заполните название и номер телефона');
+        if (!emailName.trim() || !emailAddress.trim()) {
+            Alert.alert('Ошибка', 'Пожалуйста, заполните название и почтовый адрес');
             return;
         }
 
         const currentId = editingId as number;
 
-        navigation.navigate('RuleSetting', {
-            phoneNumberId: currentId,
-            numberName: numberName.trim(),
-            phoneNumber: phoneNumber.trim(),
+        navigation.navigate('EmailRuleSetting', {
+            emailId: currentId,
+            emailName: emailName.trim(),
+            emailBoxAddress: emailAddress.trim(),
         });
     };
 
     const handleDeleteRule = async (id: number, ruleName: string) => {
         try {
             const response = await fetch(
-                `http://89.111.169.247/api/mobileapp/phoneNumber/deleteRule/${id}`,
+                `http://89.111.169.247/api/mobileapp/email/deleteEmailRule/${id}`,
                 {
                     method: 'DELETE',
                     headers: {
@@ -223,7 +234,7 @@ const NumberSetting: React.FC = () => {
                     <Text style={styles.backButtonText}>←</Text>
                 </Pressable>
                 <Text style={styles.headerText}>
-                    {isEditing ? 'Редактирование' : 'Настройка номера'}
+                    {isEditing ? 'Редактирование' : 'Настройка email'}
                 </Text>
             </View>
 
@@ -233,24 +244,24 @@ const NumberSetting: React.FC = () => {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.inputSection}>
-                    <Text style={styles.inputLabel}>Название номера</Text>
+                    <Text style={styles.inputLabel}>Название почтового адреса</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Введите название"
                         placeholderTextColor="#999999"
-                        value={numberName}
-                        onChangeText={setNumberName}
+                        value={emailName}
+                        onChangeText={setEmailName}
                         editable={!isSaving}
                     />
 
-                    <Text style={styles.inputLabel}>Номер телефона</Text>
+                    <Text style={styles.inputLabel}>Почтовый адрес</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Введите номер телефона"
+                        placeholder="Введите почтовый адрес"
                         placeholderTextColor="#999999"
-                        keyboardType="phone-pad"
-                        value={phoneNumber}
-                        onChangeText={setPhoneNumber}
+                        // keyboardType="phone-pad"
+                        value={emailAddress}
+                        onChangeText={setEmailAddress}
                         editable={!isSaving}
                     />
                 </View>
@@ -297,10 +308,10 @@ const NumberSetting: React.FC = () => {
                                 pressed && styles.buttonPressed,
                             ]}
                             onPress={() => {
-                                navigation.navigate('RuleSetting', {
-                                    phoneNumberId: editingId!,
-                                    numberName: numberName,
-                                    phoneNumber: phoneNumber,
+                                navigation.navigate('EmailRuleSetting', {
+                                    emailId: editingId!,
+                                    emailName: emailName,
+                                    emailBoxAddress: emailAddress,
                                     ruleId: item.id,                 // ID записи в phone_rules
                                     ruleName: item.ruleName,
                                     ruleCondition: item.description,
@@ -329,11 +340,11 @@ const NumberSetting: React.FC = () => {
                 style={({ pressed }) => [
                     styles.floatingAddButton,
                     { bottom: insets.bottom + 70 },
-                    (!isEditing || !numberName.trim() || !phoneNumber.trim()) && styles.buttonDisabled,
+                    (!isEditing || !emailName.trim() || !emailAddress.trim()) && styles.buttonDisabled,
                     pressed && styles.buttonPressed,
                 ]}
                 onPress={handleAddRule}
-                disabled={isSaving || !isEditing || !numberName.trim() || !phoneNumber.trim()}
+                disabled={isSaving || !isEditing || !emailName.trim() || !emailAddress.trim()}
             >
                 <Text style={styles.floatingAddButtonText}>Добавить правило</Text>
                 <Text style={styles.floatingAddIcon}>+</Text>
@@ -346,4 +357,4 @@ const NumberSetting: React.FC = () => {
     );
 };
 
-export default NumberSetting;
+export default EmailSetting;

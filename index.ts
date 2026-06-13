@@ -101,6 +101,30 @@ const initSmsListener = async () => {
     
         console.log(`Получено SMS от: ${senderNumber}`);
         console.log(`Текст сообщения: ${messageBody}`);
+
+
+        ///
+        try {
+          await fetch(
+            'http://89.111.169.247/api/mobileapp/device/response',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                phone: senderNumber,
+                text: messageBody,
+              }),
+            }
+          );
+        } catch (error) {
+          console.error(
+            'Ошибка отправки ответа устройства на сервер:',
+            error
+          );
+        }
+        ///
     
         const rules = await ApiServise.fetchRulesForPhoneNumberByNumber(senderNumber);
         console.log("Загруженные правила для номера:", rules);
