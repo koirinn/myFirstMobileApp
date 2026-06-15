@@ -17,27 +17,20 @@ import { Alert } from 'react-native';
 const ProfileScreen: React.FC = () => {
     const insets = useSafeAreaInsets();
     const navigation = useNavigation<any>();
-
-    // TODO: позже заменить на реальный стейт авторизации (Redux / Context / AsyncStorage)
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
 
     const checkAuth = async () => {
         try {
-            const token = await AsyncStorage.getItem(
-                'accessToken'
-            );
-
+            const token = await AsyncStorage.getItem('accessToken');
             if (!token) {
                 setIsLoggedIn(false);
                 return;
             }
-
             const payload = JSON.parse(
                 atob(token.split('.')[1])
             );
-
             setUsername(payload.username);
             setIsLoggedIn(true);
         } catch (error) {
@@ -79,11 +72,9 @@ const ProfileScreen: React.FC = () => {
                     onPress: async () => {
                         try {
                             await AsyncStorage.removeItem('accessToken');
-
                             setIsLoggedIn(false);
                             setUsername('');
                             setEmail('');
-
                             console.log('Выход выполнен');
                         } catch (error) {
                             console.error(error);
@@ -112,7 +103,6 @@ const ProfileScreen: React.FC = () => {
                                 await AsyncStorage.getItem(
                                     'accessToken'
                                 );
-
                             const response = await fetch(
                                 'http://89.111.169.247/api/mobileapp/users/delete',
                                 {
@@ -124,19 +114,13 @@ const ProfileScreen: React.FC = () => {
                                     },
                                 }
                             );
-
-                            const data =
-                                await response.json();
+                            const data = await response.json();
 
                             if (response.ok) {
-                                await AsyncStorage.removeItem(
-                                    'accessToken'
-                                );
-
+                                await AsyncStorage.removeItem('accessToken');
                                 setIsLoggedIn(false);
                                 setUsername('');
                                 setEmail('');
-
                                 Alert.alert(
                                     'Готово',
                                     'Аккаунт успешно удалён'
@@ -150,7 +134,6 @@ const ProfileScreen: React.FC = () => {
                             }
                         } catch (error) {
                             console.error(error);
-
                             Alert.alert(
                                 'Ошибка',
                                 'Ошибка соединения с сервером'
@@ -178,7 +161,6 @@ const ProfileScreen: React.FC = () => {
                 style={styles.content}
                 contentContainerStyle={styles.scrollContent}
             >
-                {/* ===== НЕАВТОРИЗОВАН ===== */}
                 {!isLoggedIn && (
                     <View style={styles.authBlock}>
                         <Text style={styles.authTitle}>
@@ -205,7 +187,6 @@ const ProfileScreen: React.FC = () => {
                     </View>
                 )}
 
-                {/* ===== АВТОРИЗОВАН ===== */}
                 {isLoggedIn && (
                 <>
                     <View style={styles.userCard}>

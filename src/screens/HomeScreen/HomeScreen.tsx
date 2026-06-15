@@ -21,7 +21,6 @@ const HomeScreen: React.FC = () => {
     const insets = useSafeAreaInsets();
     const navigation = useNavigation<NavigationProp>();
 
-    // Запрос разрешений на чтение SMS при загрузке экрана
     useEffect(() => {
         const requestSmsPermission = async () => {
             if (Platform.OS === 'android') {

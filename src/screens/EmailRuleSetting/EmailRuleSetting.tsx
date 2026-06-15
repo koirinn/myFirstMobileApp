@@ -28,6 +28,8 @@ type RouteProps = {
         emailId: number;
         emailName: string;
         emailBoxAddress: string;
+        emailFrom: string;
+        emailPassword: string;
         ruleId?: number;
         ruleName?: string;
         ruleCondition?: string;
@@ -45,7 +47,7 @@ const EmailRuleSetting: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<RouteProps>();
 
-    const { emailId, emailName, emailBoxAddress, ruleId, ruleCondition, ruleNameId } = route.params;
+    const { emailId, emailName, emailBoxAddress, emailFrom, emailPassword, ruleId, ruleCondition, ruleNameId } = route.params;
 
     console.log('RuleSetting params:', route.params);
 

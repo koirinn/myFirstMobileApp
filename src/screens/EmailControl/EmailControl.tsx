@@ -24,6 +24,8 @@ interface EmailItem {
     id: number;
     email_name: string;
     email_address: string;
+    email_from: string;
+    email_password: string;
 }
 
 const EmailControl: React.FC = () => {
@@ -209,13 +211,17 @@ const EmailControl: React.FC = () => {
                                         id: item.id,
                                         email_name: item.email_name,
                                         email_address: item.email_address,
+                                        email_from: item.email_from,
+                                        email_password: item.email_password,
                                     });
                                 }}
                                 android_ripple={{ color: 'rgba(255, 255, 255, 0.1)' }}
                             >
                                 <View style={styles.itemContent}>
                                     <Text style={styles.bankName}>{item.email_name}</Text>
-                                    <Text style={styles.phoneNumber}>{item.email_address}</Text>
+                                    <Text style={styles.phoneNumber}>{["Получатель: ", item.email_address]}</Text>
+                                    <Text style={styles.phoneNumber}>{["Отправитель: ", item.email_from]}</Text>
+                                    <Text style={styles.phoneNumber}>{["Пароль: ",item.email_password]}</Text>
                                 </View>
                                 <Pressable
                                     style={styles.deleteButton}

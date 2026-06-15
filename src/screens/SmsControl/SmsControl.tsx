@@ -39,7 +39,6 @@ const SmsControl: React.FC = () => {
             setError(null);
             const numbersList: PhoneNumberItem[] = await ApiServise.fetchPhoneNumbers() || [];
             setSmsList(numbersList);
-            // Устанавливаем номера для отслеживания SMS
             const phoneNumbers = numbersList.map((item: PhoneNumberItem) => item.phone_number);
             SmsWatcher.setWatchedNumbers(phoneNumbers);
             console.log('Установлены отслеживаемые номера:', phoneNumbers);
@@ -51,7 +50,6 @@ const SmsControl: React.FC = () => {
         }
     };
 
-    // Автоматическое обновление при фокусе на экране
     useFocusEffect(
         useCallback(() => {
             console.log('Экран SmsControl в фокусе, обновляю данные...');
@@ -59,7 +57,6 @@ const SmsControl: React.FC = () => {
         }, [])
     );
 
-    // Первоначальная загрузка
     useEffect(() => {
         fetchPhoneNumbers();
     }, []);
@@ -73,7 +70,6 @@ const SmsControl: React.FC = () => {
             await ApiServise.fetchDeleteNumber(id);
             setSmsList(prevList => prevList.filter(item => item.id !== id));
             Alert.alert('Успешно', 'Номер удален');
-            // После удаления обновляем список и переустанавливаем наблюдаемые номера
             fetchPhoneNumbers();
         } catch (error) {
             console.error('Delete error:', error);
@@ -91,7 +87,6 @@ const SmsControl: React.FC = () => {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            {/* Заголовок с кнопкой "Назад" */}
             <View style={styles.header}>
                 <Pressable 
                     onPress={handleGoBack}
@@ -101,7 +96,6 @@ const SmsControl: React.FC = () => {
                 </Pressable>
                 <Text style={styles.headerText}>Контроль СМС</Text>
                 
-                {/* Кнопка обновления */}
                 <Pressable 
                     onPress={handleRefresh}
                     style={({ pressed }) => [
@@ -113,7 +107,6 @@ const SmsControl: React.FC = () => {
                 </Pressable>
             </View>
 
-            {/* Основной контент */}
             <ScrollView
                 style={styles.content}
                 contentContainerStyle={styles.scrollContent}
@@ -150,7 +143,6 @@ const SmsControl: React.FC = () => {
                     </View>
                 ) : (
                     <>
-                        {/* Список номеров */}
                         {smsList.map((item) => (
                             <Pressable
                                 key={item.id}
@@ -159,7 +151,6 @@ const SmsControl: React.FC = () => {
                                     pressed && styles.buttonPressed,
                                 ]}
                                 onPress={() => {
-                                    // Переход на экран редактирования с передачей данных
                                     navigation.navigate('NumberSetting', {
                                         id: item.id,
                                         phone_name: item.phone_name,
@@ -181,13 +172,10 @@ const SmsControl: React.FC = () => {
                             </Pressable>
                         ))}
                         
-                        {/* Отступ для плавающей кнопки */}
                         <View style={styles.floatingButtonSpacing} />
                     </>
                 )}
             </ScrollView>
-
-            {/* Плавающая кнопка "Добавить номер" */}
             <Pressable
                 style={({ pressed }) => [
                     styles.floatingAddButton,
@@ -202,7 +190,6 @@ const SmsControl: React.FC = () => {
                 <Text style={styles.floatingAddIcon}>+</Text>
             </Pressable>
 
-            {/* Нижняя навигация */}
             <View style={[styles.bottomBarContainer, { paddingBottom: insets.bottom }]}>
                 <BottomBar />
             </View>

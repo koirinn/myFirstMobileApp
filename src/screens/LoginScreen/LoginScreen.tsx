@@ -41,7 +41,6 @@ const LoginScreen: React.FC = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // alert(data.message || 'Авторизация успешна');
                 await AsyncStorage.setItem(
                     'accessToken',
                     data.token

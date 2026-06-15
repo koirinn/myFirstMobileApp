@@ -25,6 +25,8 @@ type RouteProps = {
         id?: number;
         email_name?: string;
         email_address?: string;
+        email_from?: string;
+        email_password?: string;
     };
 };
 
@@ -42,6 +44,8 @@ const EmailSetting: React.FC = () => {
 
     const [emailName, setEmailName] = useState('');
     const [emailAddress, setEmailAddress] = useState('');
+    const [emailFrom, setEmailFrom] = useState('');
+    const [emailPassword, setEmailPassword] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [rules, setRules] = useState<RuleItem[]>([]);
@@ -59,6 +63,12 @@ const EmailSetting: React.FC = () => {
         }
         if (route.params?.email_address) {
             setEmailAddress(route.params.email_address);
+        }
+        if (route.params?.email_from) {
+            setEmailFrom(route.params.email_from);
+        }
+        if (route.params?.email_password) { 
+            setEmailPassword(route.params.email_password)
         }
     }, [route.params]);
 
@@ -101,7 +111,7 @@ const EmailSetting: React.FC = () => {
     );
 
     const handleSave = async () => {
-        if (!emailName.trim() || !emailAddress.trim()) {
+        if (!emailName.trim() || !emailAddress.trim() || !emailFrom.trim() || !emailPassword.trim()) {
             Alert.alert('Ошибка', 'Пожалуйста, заполните все поля');
             return;
         }
@@ -128,6 +138,8 @@ const EmailSetting: React.FC = () => {
                 body = {
                     email_name: emailName.trim(),
                     email_address: emailAddress.trim(),
+                    email_from: emailFrom.trim(),
+                    email_password: emailPassword.trim(),
                 };
             } else {
                 url = 'http://89.111.169.247/api/mobileapp/email/addEmail';
@@ -136,6 +148,8 @@ const EmailSetting: React.FC = () => {
                     // user_id: 1,
                     email_name: emailName.trim(),
                     email_address: emailAddress.trim(),
+                    email_from: emailFrom.trim(),
+                    email_password: emailPassword.trim(),
                 };
             }
 
@@ -189,6 +203,8 @@ const EmailSetting: React.FC = () => {
             emailId: currentId,
             emailName: emailName.trim(),
             emailBoxAddress: emailAddress.trim(),
+            emailFrom: emailFrom.trim(),
+            emailPassword: emailPassword.trim(),
         });
     };
 
@@ -254,7 +270,7 @@ const EmailSetting: React.FC = () => {
                         editable={!isSaving}
                     />
 
-                    <Text style={styles.inputLabel}>Почтовый адрес</Text>
+                    <Text style={styles.inputLabel}>Почтовый адрес получателя</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Введите почтовый адрес"
@@ -262,6 +278,28 @@ const EmailSetting: React.FC = () => {
                         // keyboardType="phone-pad"
                         value={emailAddress}
                         onChangeText={setEmailAddress}
+                        editable={!isSaving}
+                    />
+
+                    <Text style={styles.inputLabel}>Почтовый адрес отправителя</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Введите почтовый адрес"
+                        placeholderTextColor="#999999"
+                        // keyboardType="phone-pad"
+                        value={emailFrom}
+                        onChangeText={setEmailFrom}
+                        editable={!isSaving}
+                    />
+
+                    <Text style={styles.inputLabel}>Пароль приложения (не является паролем от почты)</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Введите пароль"
+                        placeholderTextColor="#999999"
+                        // keyboardType="phone-pad"
+                        value={emailPassword}
+                        onChangeText={setEmailPassword}
                         editable={!isSaving}
                     />
                 </View>
@@ -312,6 +350,8 @@ const EmailSetting: React.FC = () => {
                                     emailId: editingId!,
                                     emailName: emailName,
                                     emailBoxAddress: emailAddress,
+                                    emailFrom: emailFrom,
+                                    emailPassword: emailPassword,
                                     ruleId: item.id,                 // ID записи в phone_rules
                                     ruleName: item.ruleName,
                                     ruleCondition: item.description,
@@ -340,11 +380,11 @@ const EmailSetting: React.FC = () => {
                 style={({ pressed }) => [
                     styles.floatingAddButton,
                     { bottom: insets.bottom + 70 },
-                    (!isEditing || !emailName.trim() || !emailAddress.trim()) && styles.buttonDisabled,
+                    (!isEditing || !emailName.trim() || !emailAddress.trim() || !emailFrom.trim() || !emailPassword.trim()) && styles.buttonDisabled,
                     pressed && styles.buttonPressed,
                 ]}
                 onPress={handleAddRule}
-                disabled={isSaving || !isEditing || !emailName.trim() || !emailAddress.trim()}
+                disabled={isSaving || !isEditing || !emailName.trim() || !emailAddress.trim() || !emailFrom.trim() || !emailPassword.trim()}
             >
                 <Text style={styles.floatingAddButtonText}>Добавить правило</Text>
                 <Text style={styles.floatingAddIcon}>+</Text>

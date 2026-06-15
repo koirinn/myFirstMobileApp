@@ -1,24 +1,23 @@
-// Определяем типы для навигации
-// Это помогает TypeScript понимать, какие экраны есть в приложении
-
 export type RootStackParamList = {
-    Home: undefined;       // Главный экран без параметров
-    Settings: undefined;   // Экран настроек без параметров
-    Profile: undefined;    // Экран профиля без параметров
+    Home: undefined;   
+    Settings: undefined; 
+    Profile: undefined;   
     SmsControl: undefined;
     EmailControl: undefined;
     BackScreen: undefined;
     NumberSetting: {
-        id?: number;           // при редактировании — передаётся, при добавлении — отсутствует
+        id?: number;         
         phone_name?: string;
         phone_number?: string;
         newRules?: Array<{ id: number; ruleName: string; description: string }>;
         updatedRule?: { id: number; ruleName: string; description: string };
     } | undefined; 
     EmailSetting: {
-        id?: number;           // при редактировании — передаётся, при добавлении — отсутствует
+        id?: number;     
         email_name?: string;
         email_address?: string;
+        email_from?: string;
+        email_password?: string;
         newRules?: Array<{ id: number; ruleName: string; description: string }>;
         updatedRule?: { id: number; ruleName: string; description: string };
     } | undefined; 
@@ -44,6 +43,8 @@ export type RootStackParamList = {
         emailId: number;
         emailName: string; 
         emailBoxAddress: string;
+        emailFrom: string;
+        emailPassword: string;
         ruleId?: number;
         ruleName?: string;
         ruleCondition?: string;
@@ -60,8 +61,3 @@ export type RootStackParamList = {
     LoginScreen: undefined;
     RegisterScreen: undefined;
 };
-
-// Экспортируем тип для использования в компонентах
-// export type HomeScreenNavigationProp = {
-//     navigate: (screen: keyof RootStackParamList) => void;
-// };
