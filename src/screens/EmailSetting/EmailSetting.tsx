@@ -15,7 +15,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { styles } from './EmailSetting.styles';
 import BottomBar from '../../components/BottomBar/BottomBar';
-import ApiServise from '../../services/ApiServise';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type RouteProps = {
@@ -34,7 +33,7 @@ interface RuleItem {
     id: number;
     ruleName: string;
     description: string;
-    rule_name_id: number; // ID типа правила (из phone_rules_list)
+    rule_name_id: number; 
 }
 
 const EmailSetting: React.FC = () => {
@@ -56,7 +55,6 @@ const EmailSetting: React.FC = () => {
 
     console.log(isEditing, editingId);
 
-    // Заполняем поля при получении параметров (для редактирования)
     useEffect(() => {
         if (route.params?.email_name) {
             setEmailName(route.params.email_name);
@@ -72,7 +70,6 @@ const EmailSetting: React.FC = () => {
         }
     }, [route.params]);
 
-    // Загрузка правил для почтового адреса
     const fetchRulesForEmail = async (EmailId: number) => {
         try {
             setIsLoadingRules(true);
@@ -94,14 +91,12 @@ const EmailSetting: React.FC = () => {
         }
     };
 
-    // Загружаем правила при первом открытии (если редактирование)
     useEffect(() => {
         if (isEditing && editingId) {
             fetchRulesForEmail(editingId);
         }
     }, []);
 
-    // Перезагружаем правила при возврате на экран (после добавления/редактирования правила)
     useFocusEffect(
         useCallback(() => {
             if (isEditing && editingId) {
@@ -145,7 +140,6 @@ const EmailSetting: React.FC = () => {
                 url = 'http://89.111.169.247/api/mobileapp/email/addEmail';
                 method = 'POST';
                 body = {
-                    // user_id: 1,
                     email_name: emailName.trim(),
                     email_address: emailAddress.trim(),
                     email_from: emailFrom.trim(),
@@ -275,7 +269,6 @@ const EmailSetting: React.FC = () => {
                         style={styles.input}
                         placeholder="Введите почтовый адрес"
                         placeholderTextColor="#999999"
-                        // keyboardType="phone-pad"
                         value={emailAddress}
                         onChangeText={setEmailAddress}
                         editable={!isSaving}
@@ -286,7 +279,6 @@ const EmailSetting: React.FC = () => {
                         style={styles.input}
                         placeholder="Введите почтовый адрес"
                         placeholderTextColor="#999999"
-                        // keyboardType="phone-pad"
                         value={emailFrom}
                         onChangeText={setEmailFrom}
                         editable={!isSaving}
@@ -297,7 +289,6 @@ const EmailSetting: React.FC = () => {
                         style={styles.input}
                         placeholder="Введите пароль"
                         placeholderTextColor="#999999"
-                        // keyboardType="phone-pad"
                         value={emailPassword}
                         onChangeText={setEmailPassword}
                         editable={!isSaving}
@@ -352,10 +343,10 @@ const EmailSetting: React.FC = () => {
                                     emailBoxAddress: emailAddress,
                                     emailFrom: emailFrom,
                                     emailPassword: emailPassword,
-                                    ruleId: item.id,                 // ID записи в phone_rules
+                                    ruleId: item.id,           
                                     ruleName: item.ruleName,
                                     ruleCondition: item.description,
-                                    ruleNameId: item.rule_name_id,   // ID типа правила (ключевое!)
+                                    ruleNameId: item.rule_name_id,   
                                 });
                             }}
                         >

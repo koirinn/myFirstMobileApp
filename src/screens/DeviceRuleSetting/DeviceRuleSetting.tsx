@@ -74,7 +74,6 @@ const RuleSetting: React.FC = () => {
     const isEmailRuleSelected = selectedRuleIds.includes(2);
     const isSmsRuleSelected = selectedRuleIds.includes(3);
 
-    // Загрузка email данных при редактировании email правила
     useEffect(() => {
         const fetchEmailData = async () => {
             if (isEditing && ruleId) {
@@ -91,7 +90,6 @@ const RuleSetting: React.FC = () => {
                         setEmailBody(emailInfo.description || '');
                         setCurrentEmailRuleId(ruleId);
                     } else {
-                        // Очищаем поля, если нет данных
                         setEmailAddress('');
                         setEmailSubject('');
                         setEmailBody('');
@@ -111,11 +109,8 @@ const RuleSetting: React.FC = () => {
     }, [isEditing, ruleId]);
 
 
-    // Загрузка SMS данных при редактировании SMS правила
     useEffect(() => {
-
         const fetchSmsData = async () => {
-
             if (
                 isEditing &&
                 ruleId &&
@@ -165,74 +160,12 @@ const RuleSetting: React.FC = () => {
         fetchSmsData();
 
     }, [isEditing, ruleId, selectedRuleIds]);
-
-    // Загрузка существующих email данных при выборе правила в режиме добавления
-    // useEffect(() => {
-    //     const fetchExistingEmailData = async () => {
-    //         // Если выбран email правило и номер телефона существует
-    //         if (!isEditing && phoneNumberId && isEmailRuleSelected) {
-    //             try {
-    //                 const rulesResponse = await fetch(
-    //                     `http://89.111.169.247/api/mobileapp/phoneNumber/findRulesByPhoneNumberId/${phoneNumberId}`
-    //                 );
-    //                 const rulesData = await rulesResponse.json();
-    //                 const existingEmailRule = rulesData.data?.find((r: any) => r.rule_name_id === 2);
-                    
-    //                 if (existingEmailRule) {
-    //                     const emailResponse = await fetch(
-    //                         `http://89.111.169.247/api/mobileapp/phoneNumber/getPhoneEmailsByRuleId/${existingEmailRule.id}`
-    //                     );
-    //                     const emailData = await emailResponse.json();
-                        
-    //                     if (emailData.success && emailData.data && emailData.data.length > 0) {
-    //                         const emailInfo = emailData.data[0];
-    //                         setEmailAddress(emailInfo.email || '');
-    //                         setEmailSubject(emailInfo.theme || '');
-    //                         setEmailBody(emailInfo.description || '');
-    //                         setCurrentEmailRuleId(existingEmailRule.id);
-    //                         return;
-    //                     }
-    //                 }
-                    
-    //                 // Если правило не найдено или нет данных, очищаем поля
-    //                 setEmailAddress('');
-    //                 setEmailSubject('');
-    //                 setEmailBody('');
-    //                 setCurrentEmailRuleId(null);
-    //             } catch (error) {
-    //                 console.error('Ошибка загрузки существующих email данных:', error);
-    //                 setEmailAddress('');
-    //                 setEmailSubject('');
-    //                 setEmailBody('');
-    //                 setCurrentEmailRuleId(null);
-    //             }
-    //         } else if (!isEmailRuleSelected) {
-    //             // Если email правило не выбрано, очищаем поля
-    //             setEmailAddress('');
-    //             setEmailSubject('');
-    //             setEmailBody('');
-    //             setCurrentEmailRuleId(null);
-    //         }
-    //     };
-        
-    //     fetchExistingEmailData();
-    // }, [phoneNumberId, isEditing, isEmailRuleSelected]);
-
-    // Предзаполняем поле условия
-    // useEffect(() => {
-    //     if (isEditing && ruleCondition) {
-    //         setSmsText(ruleCondition);
-    //     }
-    // }, [isEditing, ruleCondition]);
-
-    // Устанавливаем выбранное правило из параметров (если есть ruleNameId)
     useEffect(() => {
         if (isEditing && ruleNameId !== undefined) {
             setSelectedRuleIds([Number(ruleNameId)]);
         }
     }, [isEditing, ruleNameId]);
 
-    // Загружаем список всех доступных правил
     useEffect(() => {
         const fetchRules = async () => {
             try {
@@ -258,16 +191,6 @@ const RuleSetting: React.FC = () => {
         fetchRules();
     }, []);
 
-    // Показывать/скрывать дополнительные поля при выборе правила
-    // useEffect(() => {
-    //     setShowEmailFields(isEmailRuleSelected);
-    //     // Если правило не выбрано, очищаем поля (но оставляем уже загруженные данные для email правила)
-    //     if (!isEmailRuleSelected && !currentEmailRuleId) {
-    //         setEmailAddress('');
-    //         setEmailSubject('');
-    //         setEmailBody('');
-    //     }
-    // }, [isEmailRuleSelected, currentEmailRuleId]);
 
     useEffect(() => {
         setShowEmailFields(isEmailRuleSelected);
@@ -303,13 +226,6 @@ const RuleSetting: React.FC = () => {
                     : [...prev, ruleId]
             );
         }
-        // При переключении правила очищаем email поля, если не выбрано email правило
-        // if (ruleId !== 2) {
-        //     setEmailAddress('');
-        //     setEmailSubject('');
-        //     setEmailBody('');
-        //     setCurrentEmailRuleId(null);
-        // }
 
 
         if (ruleId !== 2) {
@@ -364,12 +280,6 @@ const RuleSetting: React.FC = () => {
             Alert.alert('Ошибка', 'Выберите хотя бы одно правило');
             return;
         }
-        // if (!smsText.trim()) {
-        //     Alert.alert('Ошибка', 'Введите условие для СМС');
-        //     return;
-        // }
-
-        // Валидация email полей, если выбрано правило №2
         if (isEmailRuleSelected) {
             if (!emailAddress.trim()) {
                 Alert.alert('Ошибка', 'Введите email адрес');
@@ -406,13 +316,10 @@ const RuleSetting: React.FC = () => {
 
         setIsSaving(true);
         try {
-            // const userId = 1; // Временный user_id, замените на реальный
 
             if (isEditing) {
-                // РЕЖИМ РЕДАКТИРОВАНИЯ
                 const requestBody: any = {
                     rule_name_id: selectedRuleIds[0],
-                    // rule_condition: smsText.trim(),
                 };
                 
                 if (isEmailRuleSelected) {
@@ -433,7 +340,6 @@ const RuleSetting: React.FC = () => {
                         headers: {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
-                            // Authorization: `Bearer ${token}`,
                         },
                         body: JSON.stringify(requestBody),
                     }
@@ -446,22 +352,18 @@ const RuleSetting: React.FC = () => {
                     Alert.alert('Ошибка', result.message || 'Не удалось обновить правило');
                 }
             } else {
-                // РЕЖИМ ДОБАВЛЕНИЯ
                 for (const ruleTypeId of selectedRuleIds) {
                     const requestBody: any = {
                         device_id: DeviceId,
                         rule_name_id: ruleTypeId,
-                        // rule_condition: smsText.trim(),
                     };
                     
                     if (ruleTypeId === 2 && emailAddress.trim()) {
-                        // requestBody.user_id = userId;
                         requestBody.email_address = emailAddress.trim();
                         requestBody.email_subject = emailSubject.trim();
                         requestBody.email_body = emailBody.trim();
                     }
                     if (ruleTypeId === 3 && smsPhone.trim()) {
-                        // requestBody.user_id = userId;
                         requestBody.sms_phone = smsPhone.trim();
                         requestBody.sms_text = smsMessage.trim();
                     }
@@ -595,21 +497,6 @@ const RuleSetting: React.FC = () => {
                     </Pressable>
                 </View>
 
-                {/* <View style={styles.inputSection}>
-                    <Text style={styles.inputLabel}>Применить, если в СМС содержится текст</Text>
-                    <TextInput
-                        style={[styles.input, styles.textArea]}
-                        placeholder="Введите текст для поиска в СМС"
-                        placeholderTextColor="#999999"
-                        multiline
-                        numberOfLines={4}
-                        value={smsText}
-                        onChangeText={setSmsText}
-                        editable={!isSaving}
-                    />
-                </View> */}
-
-                {/* Дополнительные поля для отправки email (показываются только при выборе правила №2) */}
                 {showEmailFields && (
                     <View style={styles.emailSection}>
                         <Text style={styles.emailSectionTitle}>Настройка отправки email</Text>

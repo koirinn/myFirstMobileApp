@@ -32,7 +32,7 @@ interface RuleItem {
     id: number;
     ruleName: string;
     description: string;
-    rule_name_id: number; // ID типа правила (из phone_rules_list)
+    rule_name_id: number; 
 }
 
 const NumberSetting: React.FC = () => {
@@ -50,7 +50,6 @@ const NumberSetting: React.FC = () => {
     const isEditing = route.params?.id !== undefined;
     const editingId = route.params?.id;
 
-    // Заполняем поля при получении параметров (для редактирования)
     useEffect(() => {
         if (route.params?.phone_name) {
             setNumberName(route.params.phone_name);
@@ -60,7 +59,6 @@ const NumberSetting: React.FC = () => {
         }
     }, [route.params]);
 
-    // Функция загрузки правил
     const fetchRulesForPhoneNumber = async (phoneNumberId: number) => {
         try {
             setIsLoadingRules(true);
@@ -73,14 +71,12 @@ const NumberSetting: React.FC = () => {
         }
     };
 
-    // Загружаем правила при первом открытии (если редактирование)
     useEffect(() => {
         if (isEditing && editingId) {
             fetchRulesForPhoneNumber(editingId);
         }
     }, []);
 
-    // Перезагружаем правила при возврате на экран (после добавления/редактирования правила)
     useFocusEffect(
         useCallback(() => {
             if (isEditing && editingId) {
@@ -122,7 +118,6 @@ const NumberSetting: React.FC = () => {
                 url = 'http://89.111.169.247/api/mobileapp/phoneNumber/addNumber';
                 method = 'POST';
                 body = {
-                    // user_id: 1,
                     phone_name: numberName.trim(),
                     phone_number: phoneNumber.trim(),
                 };
@@ -301,10 +296,10 @@ const NumberSetting: React.FC = () => {
                                     phoneNumberId: editingId!,
                                     numberName: numberName,
                                     phoneNumber: phoneNumber,
-                                    ruleId: item.id,                 // ID записи в phone_rules
+                                    ruleId: item.id,            
                                     ruleName: item.ruleName,
                                     ruleCondition: item.description,
-                                    ruleNameId: item.rule_name_id,   // ID типа правила (ключевое!)
+                                    ruleNameId: item.rule_name_id, 
                                 });
                             }}
                         >

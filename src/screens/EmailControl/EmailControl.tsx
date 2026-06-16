@@ -15,8 +15,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { styles } from './EmailControl.styles';
 import BottomBar from '../../components/BottomBar/BottomBar';
-// import * as SmsWatcher from 'react-native-sms-watcher';
-import ApiServise from '../../services/ApiServise';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -67,7 +65,6 @@ const EmailControl: React.FC = () => {
         }
     }, []);
 
-    // Автоматическое обновление при фокусе на экране
     useFocusEffect(
         useCallback(() => {
             console.log('Экран EmailControl в фокусе, обновляю данные...');
@@ -75,7 +72,6 @@ const EmailControl: React.FC = () => {
         }, [])
     );
 
-    // Первоначальная загрузка
     useEffect(() => {
         fetchEmails();
     }, []);
@@ -83,15 +79,6 @@ const EmailControl: React.FC = () => {
     const handleAddEmail = () => {
         navigation.navigate('EmailSetting');
     };
-
-    // const handleEditEmail = (email: EmailItem) => {
-    //     // Передаём все поля с правильными именами
-    //     navigation.navigate('DeviceSetting', {
-    //         id: device.id,
-    //         device_name: device.device_name,
-    //         device_phone: device.device_number,
-    //     });
-    // };
 
     const handleDeleteEmail = async (id: number) => {
         Alert.alert(
@@ -104,7 +91,6 @@ const EmailControl: React.FC = () => {
                     style: 'destructive',
                     onPress: async () => {
                         try {
-                            // const token = await AsyncStorage.getItem('accessToken');
                             const response = await fetch(`http://89.111.169.247/api/mobileapp/email/deleteEmail/${id}`, {
                                 method: 'DELETE',
                                 headers: {
@@ -138,7 +124,6 @@ const EmailControl: React.FC = () => {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            {/* Заголовок с кнопкой "Назад" */}
             <View style={styles.header}>
                 <Pressable 
                     onPress={handleGoBack}
@@ -148,7 +133,6 @@ const EmailControl: React.FC = () => {
                 </Pressable>
                 <Text style={styles.headerText}>Контроль Email</Text>
                 
-                {/* Кнопка обновления */}
                 <Pressable 
                     onPress={handleRefresh}
                     style={({ pressed }) => [
@@ -160,7 +144,6 @@ const EmailControl: React.FC = () => {
                 </Pressable>
             </View>
 
-            {/* Основной контент */}
             <ScrollView
                 style={styles.content}
                 contentContainerStyle={styles.scrollContent}
@@ -197,7 +180,6 @@ const EmailControl: React.FC = () => {
                     </View>
                 ) : (
                     <>
-                        {/* Список номеров */}
                         {emails.map((item) => (
                             <Pressable
                                 key={item.id}
@@ -206,7 +188,6 @@ const EmailControl: React.FC = () => {
                                     pressed && styles.buttonPressed,
                                 ]}
                                 onPress={() => {
-                                    // Переход на экран редактирования с передачей данных
                                     navigation.navigate('EmailSetting', {
                                         id: item.id,
                                         email_name: item.email_name,
@@ -232,13 +213,11 @@ const EmailControl: React.FC = () => {
                             </Pressable>
                         ))}
                         
-                        {/* Отступ для плавающей кнопки */}
                         <View style={styles.floatingButtonSpacing} />
                     </>
                 )}
             </ScrollView>
 
-            {/* Плавающая кнопка "Добавить почтовый адрес" */}
             <Pressable
                 style={({ pressed }) => [
                     styles.floatingAddButton,
@@ -253,7 +232,6 @@ const EmailControl: React.FC = () => {
                 <Text style={styles.floatingAddIcon}>+</Text>
             </Pressable>
 
-            {/* Нижняя навигация */}
             <View style={[styles.bottomBarContainer, { paddingBottom: insets.bottom }]}>
                 <BottomBar />
             </View>

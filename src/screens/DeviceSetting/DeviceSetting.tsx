@@ -15,7 +15,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { styles } from './DeviceSetting.styles';
 import BottomBar from '../../components/BottomBar/BottomBar';
-import ApiServise from '../../services/ApiServise';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type RouteProps = {
@@ -44,7 +43,6 @@ const DeviceSetting: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<RouteProps>();
 
-    // Поля устройства
     const [deviceName, setDeviceName] = useState('');
     const [devicePhone, setDevicePhone] = useState('');
     const [codePhrase, setCodePhrase] = useState('');
@@ -60,7 +58,6 @@ const DeviceSetting: React.FC = () => {
     const isEditing = route.params?.id !== undefined;
     const editingId = route.params?.id;
 
-    // Заполняем поля при редактировании
     useEffect(() => {
         if (route.params?.device_name) setDeviceName(route.params.device_name);
         if (route.params?.device_phone) setDevicePhone(route.params.device_phone);
@@ -70,9 +67,8 @@ const DeviceSetting: React.FC = () => {
         if (route.params?.response_interval_minutes) setResponseIntervalMinutes(String(route.params.response_interval_minutes));
     }, [route.params]);
 
-    console.log(route.params);7
+    console.log(route.params);
 
-    // Загрузка правил для устройства
     const fetchRulesForDevice = async (deviceId: number) => {
         try {
             setIsLoadingRules(true);
@@ -93,14 +89,12 @@ const DeviceSetting: React.FC = () => {
         }
     };
 
-    // Загружаем правила при первом открытии (если редактирование)
     useEffect(() => {
         if (isEditing && editingId) {
             fetchRulesForDevice(editingId);
         }
     }, []);
 
-    // Перезагружаем правила при возврате на экран (после добавления/редактирования правила)
     useFocusEffect(
         useCallback(() => {
             if (isEditing && editingId) {
@@ -205,7 +199,7 @@ const DeviceSetting: React.FC = () => {
             return;
         }
         navigation.navigate('DeviceRuleSetting', {
-            DeviceId: editingId!, // здесь можно использовать deviceId, но для правил устройств нужен отдельный RuleSetting или адаптация
+            DeviceId: editingId!,
             DeviceName: deviceName.trim(),
             DeviceNumber: devicePhone.trim(),
         });

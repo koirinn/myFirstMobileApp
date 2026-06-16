@@ -13,15 +13,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomBar from '../../components/BottomBar/BottomBar';
 import { styles } from './BackScreen.styles';
 
-// Интерфейс устройства, соответствующий ответу сервера
 interface DeviceItem {
     id: number;
     device_name: string;
-    device_number: string;      // номер телефона
-    device_request: string;     // кодовая фраза
-    device_response: string;    // кодовый ответ
-    period: number;             // периодичность (минуты)
-    interval: number;           // интервал между запросом и ответом
+    device_number: string;      
+    device_request: string; 
+    device_response: string; 
+    period: number;           
+    interval: number;          
 }
 
 const BackScreen: React.FC = () => {
@@ -73,7 +72,6 @@ const BackScreen: React.FC = () => {
     };
 
     const handleEditDevice = (device: DeviceItem) => {
-        // Передаём все поля с правильными именами
         navigation.navigate('DeviceSetting', {
             id: device.id,
             device_name: device.device_name,
