@@ -9,7 +9,7 @@ import ApiServise from './src/services/ApiServise';
 import SirenService from './src/services/SirenService';
 import SmsSendService from "./src/services/SmsSendService";
 import EmailSendService from './src/services/EmailSendService';
-import NotificationService from './src/services/NotificationService';
+// import NotificationService from './src/services/NotificationService';
 
 import App from './App';
 
@@ -195,13 +195,13 @@ const initSmsListener = async () => {
 
 
 
-const initPush = async () => {
+// const initPush = async () => {
 
-    const token =
-        await NotificationService
-            .registerForPushNotifications();
+//     const token =
+//         await NotificationService
+//             .registerForPushNotifications();
 
-    console.log(token);
+//     console.log(token);
 
     // await fetch(
     // 'http://89.111.169.247/api/mobileapp/users/savePushToken',
@@ -216,7 +216,7 @@ const initPush = async () => {
     //     })
     // }
     // );
-};
+// };
 
 
 
@@ -224,7 +224,7 @@ const initPush = async () => {
 // Вызываем функцию инициализации при старте приложения
 if (Platform.OS === 'android') {
   initSmsListener();
-  initPush();
+  // initPush();
 }
 
 registerRootComponent(App);
