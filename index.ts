@@ -5,11 +5,12 @@ import {
   requestReadSMSPermission,
   startReadSMS,
 } from '@maniac-tech/react-native-expo-read-sms';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ApiServise from './src/services/ApiServise';
 import SirenService from './src/services/SirenService';
 import SmsSendService from "./src/services/SmsSendService";
 import EmailSendService from './src/services/EmailSendService';
-// import NotificationService from './src/services/NotificationService';
+import NotificationService from './src/services/NotificationService';
 
 import App from './App';
 
@@ -195,28 +196,37 @@ const initSmsListener = async () => {
 
 
 
-// const initPush = async () => {
+const initPush = async () => {
+    NotificationService.listenNotifications();
+    console.log("initPush");
+    const token = await NotificationService.registerForPushNotifications();
 
-//     const token =
-//         await NotificationService
-//             .registerForPushNotifications();
+    console.log("токен такой: ", token);
 
-//     console.log(token);
+    if (token) {
+      const accessToken = await AsyncStorage.getItem(
+        'accessToken'
+      );
 
-    // await fetch(
-    // 'http://89.111.169.247/api/mobileapp/users/savePushToken',
-    // {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         Authorization: `Bearer ${token}`
-    //     },
-    //     body: JSON.stringify({
-    //         push_token: expoToken
-    //     })
-    // }
-    // );
-// };
+      if (!accessToken) {
+        throw new Error('NOT_AUTHORIZED');
+      }
+
+    await fetch(
+        "http://89.111.169.247/api/mobileapp/users/savePushToken",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+                push_token: token,
+            }),
+        }
+    );
+}
+};
 
 
 
@@ -224,7 +234,7 @@ const initSmsListener = async () => {
 // Вызываем функцию инициализации при старте приложения
 if (Platform.OS === 'android') {
   initSmsListener();
-  // initPush();
+  initPush();
 }
 
 registerRootComponent(App);

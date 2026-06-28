@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "776328790994",
+    "project_id": "savemytime-6e2fa",
+    "storage_bucket": "savemytime-6e2fa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:776328790994:android:a9ca75c69c361f767f7e0b",
+        "android_client_info": {
+          "package_name": "com.anonymous.MyFirstMobileApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnrgGi3DvRBkFyASXggGS5W0keEcxJNlc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
